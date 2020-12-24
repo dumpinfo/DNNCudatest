@@ -1,0 +1,53 @@
+The program contained in this directory is an upgrade of the MLFN program
+supplied with the book "Signal and Image Processing with Neural Networks"
+by Timothy Masters.  A few bugs have been fixed, and the material discussed
+in the first three chapters of this text have been incorporated.
+
+The command control file syntax is fully compatible with the previous version.
+Control files written for the MLFN program should run correctly under MLFN2.
+Because of some minor changes, slightly different results may be obtained.
+See MLFN2.CPP for a complete listing of all defaults, some of which have
+changed from MLFN.
+
+The following bugs have been fixed:
+  1) FLRAND was limited to only 2^19 different values.  This version has the
+     full 2^32 different values.  Because of shuffling, this is actually an
+     insignificant problem for MLFN, but it's theoretically nicer this way.
+     Also, other applications may expect the full range of possibilities.
+  2) The method of peeling random numbers after setting the seed, as discussed
+     in Chapter 2, has been implemented in ANNEAL1.CPP.  This is a very
+     significant improvement for small networks that are trained with many
+     retries.
+  3) The command ZERO CONFUSION ROW is now allowed only in CLASSIFICATION 
+     output mode.  In MLFN, using that command in other modes would cause
+     a serious runtime error.
+  4) There was a logic error near the end of AN1_CJ.CPP.  This has been
+     repaired in the new version, ANX_DD.CPP.  The error had the following
+     implication.  All PRETRIEs were done correctly, and refinement was then
+     also done correctly.  But thereafter, refinement of subsequent retires
+     was done only on networks that beat the refined best, rather than the
+     old best before refinement.  The result is that potential winners could
+     be missed.  In practice, this is not a serious problem, but it is an
+     annoyance that needed repair.
+
+The following learning methods have been added:
+  AN1 - This is identical to the old SIMULATED ANNEALING method (which was
+        kept for the sake of backward compatibility).  The 'primitive'
+        annealing method described in Chapter 2 is used.
+  AN2 - This is the general annealing method of Chapter 2.
+  AN1_CJ, AN2_CJ, AN1_LM, AN2_LM - These are hybrids (per Chapter 3) of the
+        AN1 and AN2 algorithms with conjugate gradients and Levenberg-Marquardt.
+        The AN1_CJ method was provided by MLFN.
+  REGRESS_LM - This is identical to REGRESS_CJ except that the Levenberg-
+        Marquardt algorithm is used in place of conjugate gradients.
+  SS - Stochastic smoothing (Chapter 2) is used.
+  SSG - Stochastic smoothing with gradient hints (Chapter 3) is used.
+
+The following simulated annealing parameters (for both INITIALIZATION and
+ESCAPE) have been added to accomodate the AN2 algorithm (Chapter 2).
+  RATIO = number - User ratio for influencing the early acceptance rate
+  REDUCTION = EXPONENTIAL or FAST - Usual or Szu temperature reduction method
+  CLIMB or NOCLIMB - Usual or Szu acceptance criterion
+  RANDOM = GAUSSIAN or CAUCHY - Random perturbation generator.  This is also
+      valid for AN1.
+

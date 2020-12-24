@@ -1,0 +1,51 @@
+The program PNN.EXE is the program whose operation is described in the
+last chapter, "Using the PNN Program."
+Complete source code for this program can be found in the subdirectory
+\PNN on this disk.
+
+The program MLFN2.EXE is an upgrade to the MLFN program.  More information
+can be found in the file READ.ME in the MLFN2 subdirectory.
+
+These programs were compiled for 32-bit machines.  The implication is that
+they can only be run on 386 or higher processors.
+To recompile them for 16-bit processors, change the flag VERSION_16_BIT
+in CONST.H to 1.  The resulting version will have greatly reduced power.
+
+The programs PNNF.EXE and MLFN2F.EXE are faster and more accurate versions
+of PNN.EXE and MLFN2.EXE, but they require that a math coprocessor be
+present.
+
+Portions of the source code were originally published in PRACTICAL NEURAL
+NETWORK RECIPES IN C++ by Timothy Masters, Copyright (c) 1993 by
+Academic Press, Inc.
+
+The subdirectory PNN\\VALIDATE on this disk contains the validation 
+command files listed at the end of the last chapter of the book.  
+These may be useful to readers who recompile the program for their 
+own platform.  Please note that the conjugate gradient algorithm, when 
+applied to ill-conditioned problems like those contained in this 
+validation suite, is extremely sensitive to floating-point rounding 
+methods.  It is to be expected that different compilers may produce 
+different results.
+
+The subdirectory \MISC on this disk contains source code for all of the
+important examples listed in the book.
+
+All of the code on this disk has been tested for ANSI compatibility.
+The author uses Symantec C++ for all development.  Borland C++ has been
+shown to compile 16-bit versions.  Since all development platforms require
+their own unique project or MAKE files, no such files have been included.
+Readers should find it straightforward to compile and link all of the
+source modules using standard libraries.
+
+Please remember that the programs and algorithms in this book/disk set
+have been included for instructional purposes only.  All large programming
+projects contain bugs.  Even though extensive testing has been done,
+neither the publisher nor the author make any representations or warranties
+concerning the correctness of these programs and algorithms, or their
+suitability for any particular task.  They should not be used in any
+application in which there is risk of injury or serious loss.
+The publisher and author shall not be liable for any loss incurred as a
+result of the use of these programs or algorithms.
+
+

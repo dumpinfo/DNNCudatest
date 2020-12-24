@@ -1,0 +1,7 @@
+mlfn2 activity act_func
+anneal1 anneal2 an1 an2 anx_dd
+confuse conjgrad control direcmin dotprod dotprodc
+execute gradient layernet lev_marq limit lm_core
+mem messages parsdubl perturb random regress regrs_dd
+shake ssg svdcmp test train flrand wt_save
+

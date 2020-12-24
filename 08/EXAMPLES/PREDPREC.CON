@@ -1,0 +1,480 @@
+;  Use regional temperatures to predict precipitation for NY
+
+PROGRESS ON
+
+;------------------------------------------------------------------------------
+;  Initialize for pretty displays
+;------------------------------------------------------------------------------
+
+DISPLAY RATE = 12          ; Twelve months per year
+DISPLAY ORIGIN = 1895      ; Starting year
+
+;------------------------------------------------------------------------------
+;  Read the 10 temperature series for NY.
+;  Use the first 83 years as the training set.
+;  Keep the remaining 12 years as a test set.
+;  The first field for each case is the date, so the NAME command starts
+;  with a comman to skip this field.
+;------------------------------------------------------------------------------
+
+NAME = , tmp1, tmp2, tmp3, tmp4, tmp5, tmp6, tmp7, tmp8, tmp9, tmp10
+READ SIGNAL FILE = temp.ny
+
+NAME = t1          ; This will be the training set
+COPY = 996 tmp1    ; Keep the first 83 years
+NAME = v1          ; This will be the validation set
+COPY = -144 tmp1   ; Keep the last 12 years
+
+NAME = t2
+COPY = 996 tmp2
+NAME = v2
+COPY = -144 tmp2
+
+NAME = t3
+COPY = 996 tmp3
+NAME = v3
+COPY = -144 tmp3
+
+NAME = t4
+COPY = 996 tmp4
+NAME = v4
+COPY = -144 tmp4
+
+NAME = t5
+COPY = 996 tmp5
+NAME = v5
+COPY = -144 tmp5
+
+NAME = t6
+COPY = 996 tmp6
+NAME = v6
+COPY = -144 tmp6
+
+NAME = t7
+COPY = 996 tmp7
+NAME = v7
+COPY = -144 tmp7
+
+NAME = t8
+COPY = 996 tmp8
+NAME = v8
+COPY = -144 tmp8
+
+NAME = t9
+COPY = 996 tmp9
+NAME = v9
+COPY = -144 tmp9
+
+NAME = t10
+COPY = 996 tmp10
+NAME = v10
+COPY = -144 tmp10
+
+;------------------------------------------------------------------------------
+;  Read the single predicted precipitation series for NY.
+;  Again, use the first 83 years as the training set.
+;  Keep the remaining 12 years as a test set.
+;------------------------------------------------------------------------------
+
+NAME = , prec
+READ SIGNAL FILE = prec.ny
+LOG = prec
+
+NAME = t_precip
+COPY = 996 prec
+NAME = v_precip
+COPY = -144 prec
+
+;------------------------------------------------------------------------------
+;  Just for fun, fit a naive model to the precipitation series alone.
+;  Use just the precipitation one and two years ago to predict now.
+;  We will compare this model's error to the complex one coming soon.
+;------------------------------------------------------------------------------
+
+CLEAR INPUT LIST
+CLEAR OUTPUT LIST
+INPUT = t_precip 12
+INPUT = t_precip 24
+OUTPUT = t_precip
+
+TRAIN ARMA = naive
+
+CLEAR INPUT LIST
+CLEAR OUTPUT LIST
+INPUT = v_precip 12
+INPUT = v_precip 24
+OUTPUT = v_precip
+
+NAME = v_naive
+ARMA PREDICT = 144 naive
+
+;------------------------------------------------------------------------------
+;  Compute the principal component object definition from the training set,
+;  then transform both sets using this definition.
+;------------------------------------------------------------------------------
+
+CLEAR INPUT LIST
+CLEAR OUTPUT LIST
+INPUT = t1
+INPUT = t2
+INPUT = t3
+INPUT = t4
+INPUT = t5
+INPUT = t6
+INPUT = t7
+INPUT = t8
+INPUT = t9
+INPUT = t10
+CLASS = dummy            ; Any name will do
+CUMULATE TRAINING SET    ; This builds the training set
+
+ORTHOGONALIZATION TYPE = PRINCIPAL COMPONENTS  ; This model ignores class
+ORTHOGONALIZATION STANDARDIZE = YES            ; Usually appropriate
+DEFINE ORTHOGONALIZATION = princo              ; Compute model
+
+;  For the training set, keep the same INPUT list as defined the model
+
+NAME = t_fac1 , t_fac2 , t_fac3
+APPLY ORTHOGONALIZATION = princo
+
+;  For the test set, we need a new INPUT list
+
+CLEAR INPUT LIST
+INPUT = v1
+INPUT = v2
+INPUT = v3
+INPUT = v4
+INPUT = v5
+INPUT = v6
+INPUT = v7
+INPUT = v8
+INPUT = v9
+INPUT = v10
+NAME = v_fac1 , v_fac2 , v_fac3
+APPLY ORTHOGONALIZATION = princo
+
+;------------------------------------------------------------------------------
+;  Display the training set principal components and the precipitation series.
+;  Do the same for the validation set.
+;------------------------------------------------------------------------------
+
+DISPLAY = t_fac1
+DISPLAY = t_fac2
+DISPLAY = t_fac3
+DISPLAY = t_precip
+
+DISPLAY = v_fac1
+DISPLAY = v_fac2
+DISPLAY = v_fac3
+DISPLAY = v_precip
+
+;------------------------------------------------------------------------------
+;  Define an ARMA model using the following terms:
+;    Each temperature principal component at AR lags of 1, 2, 3, 12, 13
+;    Each temperature principal component at an MA lag of 1.
+;    The precipitation at AR lags of 1, 2, 3, 12, 13
+;    The precipitation at an MA lag of 1.
+;  This is a VERY large model.  In practice, we would use far fewer terms.
+;------------------------------------------------------------------------------
+
+CLEAR INPUT LIST
+CLEAR OUTPUT LIST
+INPUT = t_fac1 1-3
+INPUT = t_fac1 12-13
+INPUT = t_fac2 1-3
+INPUT = t_fac2 12-13
+INPUT = t_fac3 1-3
+INPUT = t_fac3 12-13
+INPUT = t_precip 1-3
+INPUT = t_precip 12-13
+OUTPUT = t_fac1 1
+OUTPUT = t_fac2 1
+OUTPUT = t_fac3 1
+OUTPUT = t_precip 1
+
+; RESTORE ARMA = arma1 FROM prdprec1.arm
+TRAIN ARMA = arma1
+SAVE ARMA = arma1 to prdprec1.arm
+
+;------------------------------------------------------------------------------
+;  Predict and display each series within the training set.
+;  Also display the errors (shocks).
+;------------------------------------------------------------------------------
+
+NAME = t_pred_fac1 , t_pred_fac2 , t_pred_fac3 , t_pred_precip
+ARMA PREDICT = 996 arma1
+DISPLAY DOMAIN = 14 996   ; Do not clutter the display with the replicated
+DISPLAY = t_pred_fac1     ; observations at the start of the series.
+DISPLAY = t_pred_fac2     ; (The max input lag is 13, so the first 13
+DISPLAY = t_pred_fac3     ; predictions are just the original data)
+DISPLAY = t_pred_precip
+
+NAME = t_shock_fac1       ; Each shock is the true minus the predicted
+SUBTRACT = t_fac1 AND t_pred_fac1
+NAME = t_shock_fac2
+SUBTRACT = t_fac2 AND t_pred_fac2
+NAME = t_shock_fac3
+SUBTRACT = t_fac3 AND t_pred_fac3
+NAME = t_shock_precip
+SUBTRACT = t_precip AND t_pred_precip
+
+DISPLAY = t_shock_fac1
+DISPLAY = t_shock_fac2
+DISPLAY = t_shock_fac3
+DISPLAY = t_shock_precip
+
+;------------------------------------------------------------------------------
+;  Now do the same, but within the validation set that was held back.
+;  These displays provide a visual indication of the quality of the model,
+;  and the numbers in the audit log file provide hard quantification.
+;------------------------------------------------------------------------------
+
+CLEAR INPUT LIST
+CLEAR OUTPUT LIST
+INPUT = v_fac1 1-3
+INPUT = v_fac1 12-13
+INPUT = v_fac2 1-3
+INPUT = v_fac2 12-13
+INPUT = v_fac3 1-3
+INPUT = v_fac3 12-13
+INPUT = v_precip 1-3
+INPUT = v_precip 12-13
+OUTPUT = v_fac1 1
+OUTPUT = v_fac2 1
+OUTPUT = v_fac3 1
+OUTPUT = v_precip 1
+
+NAME = v_pred_fac1 , v_pred_fac2 , v_pred_fac3 , v_pred_precip
+ARMA PREDICT = 144 arma1
+DISPLAY ORIGIN = 1978
+DISPLAY DOMAIN = 14 144
+DISPLAY = v_pred_fac1
+DISPLAY = v_pred_fac2
+DISPLAY = v_pred_fac3
+DISPLAY = v_pred_precip
+
+NAME = v_shock_fac1
+SUBTRACT = v_fac1 AND v_pred_fac1
+NAME = v_shock_fac2
+SUBTRACT = v_fac2 AND v_pred_fac2
+NAME = v_shock_fac3
+SUBTRACT = v_fac3 AND v_pred_fac3
+NAME = v_shock_precip
+SUBTRACT = v_precip AND v_pred_precip
+
+DISPLAY = v_shock_fac1
+DISPLAY = v_shock_fac2
+DISPLAY = v_shock_fac3
+DISPLAY = v_shock_precip
+
+;------------------------------------------------------------------------------
+;  Use the independent test set to compute confidences and do prediction.
+;  The required input and output lists are still in effect from above.
+;------------------------------------------------------------------------------
+
+CONFIDENCE PROBABILITY = 80
+CLEAR CONFIDENCE COMPENSATION
+CONFIDENCE LOG = v_precip
+ARMA CONFIDENCE = 24 arma1
+NAME = v_fac1 , v_fac2 , v_fac3 , v_precip
+ARMA PREDICT = 168 arma1
+EXP = v_precip
+DISPLAY DOMAIN = 14 168
+DISPLAY CONFIDENCE = v_fac1
+DISPLAY CONFIDENCE = v_fac2
+DISPLAY CONFIDENCE = v_fac3
+DISPLAY CONFIDENCE = v_precip
+
+;------------------------------------------------------------------------------
+;  Now that we have an idea of performance, pool all of the data to find
+;  a grand prediction model.
+;------------------------------------------------------------------------------
+
+CLEAR INPUT LIST
+CLEAR OUTPUT LIST
+INPUT = tmp1
+INPUT = tmp2
+INPUT = tmp3
+INPUT = tmp4
+INPUT = tmp5
+INPUT = tmp6
+INPUT = tmp7
+INPUT = tmp8
+INPUT = tmp9
+INPUT = tmp10
+
+NAME = fac1 , fac2 , fac3
+APPLY ORTHOGONALIZATION = princo
+
+CLEAR INPUT LIST
+CLEAR OUTPUT LIST
+INPUT = fac1 1-3
+INPUT = fac1 12-13
+INPUT = fac2 1-3
+INPUT = fac2 12-13
+INPUT = fac3 1-3
+INPUT = fac3 12-13
+INPUT = prec 1-3
+INPUT = prec 12-13
+OUTPUT = fac1 1
+OUTPUT = fac2 1
+OUTPUT = fac3 1
+OUTPUT = prec 1
+
+; RESTORE ARMA = arma2 FROM prdprec2.arm
+TRAIN ARMA = arma2
+SAVE ARMA = arma2 to prdprec2.arm
+
+;  Predict and display each series.  Also compute the errors (shocks).
+
+NAME = pred_fac1 , pred_fac2 , pred_fac3 , pred_prec
+ARMA PREDICT = 1140 arma2
+DISPLAY ORIGIN = 1895
+DISPLAY DOMAIN = 14 1140
+DISPLAY = pred_fac1
+DISPLAY = pred_fac2
+DISPLAY = pred_fac3
+DISPLAY = pred_prec
+
+NAME = shock_fac1
+SUBTRACT = fac1 AND pred_fac1
+NAME = shock_fac2
+SUBTRACT = fac2 AND pred_fac2
+NAME = shock_fac3
+SUBTRACT = fac3 AND pred_fac3
+NAME = shock_prec
+SUBTRACT = prec AND pred_prec
+
+;  Compute confidences and do prediction.
+;  Save a copy of each of the four signals, as we will need them
+;  for the next demonstration (hybrid prediction).
+
+NAME = fac1_save
+COPY = fac1
+NAME = fac2_save
+COPY = fac2
+NAME = fac3_save
+COPY = fac3
+NAME = prec_save
+COPY = prec
+
+CONFIDENCE PROBABILITY = 80
+CLEAR CONFIDENCE COMPENSATION
+CONFIDENCE LOG = prec
+ARMA CONFIDENCE = 24 arma2
+NAME = fac1 , fac2 , fac3 , prec
+ARMA PREDICT = 1164 arma2
+EXP = prec
+DISPLAY DOMAIN = 1021 1164  ; Makes display prettier
+DISPLAY CONFIDENCE = fac1
+DISPLAY CONFIDENCE = fac2
+DISPLAY CONFIDENCE = fac3
+DISPLAY CONFIDENCE = prec
+
+;------------------------------------------------------------------------------
+;  Train a neural network to predict the shocks.
+;  Do the predictions and display them, along with confidence intervals
+;  for the predicted shocks.
+
+;  Usually, only the shocks are used in this technique to facilitate
+;  recursive prediction.  (Reaching the end of an input series is ALWAYS
+;  bad!)  However, let us agree in advance that only 24 months of prediction
+;  will be done.  Thus, we can legally include other series in this prediction
+;  as long as their lag is at least this large (hence avoiding termination
+;  or increasing the model complexity by excess recursion).  This is to our
+;  advantage here, since the seasonal effect may be profound.
+
+;  We do not need a large CUMULATE EXCLUDE to exclude the invalid shocks
+;  at the beginning of the shock series.  This is because the use of other
+;  inputs at a lag of 24 causes this many cases to be automatically excluded.
+;------------------------------------------------------------------------------
+
+CLEAR INPUT LIST
+CLEAR OUTPUT LIST
+CLEAR TRAINING SET
+CLEAR CLASSES
+INPUT = shock_fac1 1-2  ; These are the usual shocks, recursively predicted
+INPUT = shock_fac1 6
+INPUT = shock_fac1 12
+INPUT = shock_fac2 1-2
+INPUT = shock_fac2 6
+INPUT = shock_fac2 12
+INPUT = shock_fac3 1-2
+INPUT = shock_fac3 6
+INPUT = shock_fac3 12
+INPUT = shock_prec 1-2
+INPUT = shock_prec 6
+INPUT = shock_prec 12
+INPUT = fac1_save 24    ; These are large-lag old inputs to grab season info
+INPUT = prec_save 24
+OUTPUT = shock_fac1     ; Recursive prediction of inputs that are not lagged
+OUTPUT = shock_fac2     ; further than the maximum future prediction is
+OUTPUT = shock_fac3     ; mandatory to avoid error produced by replicating
+OUTPUT = shock_prec     ; terminal points.
+CUMULATE EXCLUDE = 10   ; 24 (raw data) - 12 (shocks) + 10 = 22 (enough)
+CUMULATE TRAINING SET
+
+NETWORK MODEL = MLFN
+MLFN HID 1 = 6
+MLFN RESTARTS = 2
+MLFN PRETRIES = 3
+ACCURACY = 8
+REFINE = 4
+MLFN LEARNING METHOD = AN1_CJ
+
+; RESTORE NETWORK = temp FROM predprec.wts
+TRAIN NETWORK = temp
+SAVE NETWORK = temp to predprec.wts
+CLEAR TRAINING SET     ; Not needed, but it frees memory
+
+NAME = shock_fac1 , shock_fac2 , shock_fac3 , shock_prec
+NETWORK CONFIDENCE = 24 temp
+NETWORK PREDICT = 1164 temp
+
+DISPLAY CONFIDENCE = shock_fac1
+DISPLAY CONFIDENCE = shock_fac2
+DISPLAY CONFIDENCE = shock_fac3
+DISPLAY CONFIDENCE = shock_prec
+
+;------------------------------------------------------------------------------
+;  Now use a hybrid ARMA/neural model to predict.
+
+;  Note that this version of NPREDICT does not allow computation of
+;  confidence intervals for hybrid predictions.  Perhaps a future version...
+
+;  Also note that when we do ARMA prediction with predicted shocks, there
+;  is no such thing as 'pointwise' prediction.  Even though the prediction
+;  may specify (in the NAME command) different signal names from those in
+;  the output list, the true shocks are used, even within the known series.
+;  Therefore, the predictions during the known extent are equal to the
+;  true values.
+;------------------------------------------------------------------------------
+
+CLEAR INPUT LIST
+CLEAR OUTPUT LIST
+INPUT = fac1_save 1-3
+INPUT = fac1_save 12-13
+INPUT = fac2_save 1-3
+INPUT = fac2_save 12-13
+INPUT = fac3_save 1-3
+INPUT = fac3_save 12-13
+INPUT = prec_save 1-3
+INPUT = prec_save 12-13
+OUTPUT = fac1_save 1
+OUTPUT = fac2_save 1
+OUTPUT = fac3_save 1
+OUTPUT = prec_save 1
+
+ARMA SHOCK = shock_fac1 FOR fac1_save
+ARMA SHOCK = shock_fac2 FOR fac2_save
+ARMA SHOCK = shock_fac2 FOR fac3_save
+ARMA SHOCK = shock_prec FOR prec_save
+
+NAME = hybrid_fac1 , hybrid_fac2 , hybrid_fac3 , hybrid_prec
+ARMA PREDICT = 1164 arma2
+EXP = hybrid_prec
+DISPLAY = hybrid_fac1
+DISPLAY = hybrid_fac2
+DISPLAY = hybrid_fac3
+DISPLAY = hybrid_prec
+

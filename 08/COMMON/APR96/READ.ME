@@ -1,0 +1,45 @@
+ARMACONF.CPP
+   In line 145, when the progress report is signaled, a divide by zero can
+   occur in some rare situations.  The fix is to add 1 to the denominator.
+
+DERMIN.CPP
+   The expression 'scale = dot1 / dot2' can overflow if dot2 is practically
+   zero, a very rare but possible condition.  Avoid this divide if it is tiny.
+   
+MRFFT_P.CPP
+   The variables 'near' and 'far' are renamed 'nearp' and 'farp' to avoid
+   complaints from old 16-bit compilers.
+
+NET_CONF.CPP
+   In line 237, when the progress report is signaled, a divide by zero can
+   occur in some rare situations.  The fix is to add 1 to the denominator.
+   Also, if the user presses ESCape, the confidence must not be computed
+   at the end of the routine because some values are undefined.
+
+NET_PRED.CPP
+   In line 271, when the progress report is signaled, a divide by zero occurs
+   if fewer than ten future cases are being predicted.  The fix is to add 1
+   to the denominator.
+
+POWELL.CPP
+   A flaw in the algorithm implementation slows convergence.
+   See the code change for details.
+
+SVDCMP.CPP
+   Near the beginning of the member function 'left ( double *matrix )'
+   a divide expression could overflow if the numerator is huge and the
+   denominator is tiny.  Thus, the guard expression 'if (w[col] == 0.0) {'
+   is changed to 'if (fabs(w[col]) < 1.e-60) {' to discourage this.
+   This problem appears to be extremely rare.
+
+TESTNET.CPP
+   In line 143, when the progress report is signaled, a divide by zero can
+   occur in some rare situations.  The fix is to add 1 to the denominator.
+
+TRAIN.CPP
+   In the operator= member function, several member variables are not set
+   to NULL in case of memory allocation failure.  As a result, if memory
+   runs out at the moment this function is called, the destructor will
+   attempt to free invalid pointers.  The fix is to set them to NULL
+   appropriately.
+

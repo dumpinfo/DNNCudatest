@@ -1,0 +1,60 @@
+;  This is a trivial autoassociative task that can be easily solved.
+;  We use no hidden layer, so that regression initialization is available.
+;  This would give us a perfect fit if the output activation were linear.
+;  So we make it nonlinear and use conjugate gradients to trim things up.
+
+DOMAIN = REAL
+ERROR TYPE = MEAN SQUARE
+MODE = AUTOASSOCIATION
+OUTPUT ACTIVATION = NONLINEAR
+
+INPUTS = 6
+OUTPUTS = 6
+FIRST HIDDEN = 0
+SECOND HIDDEN = 0
+
+CUMULATE TRAINING SET = zero4
+CUMULATE TRAINING SET = one4
+
+LEARNING ALGORITHM = REGRESS_CJ
+COMPUTE WEIGHTS 
+ERASE TRAINING SET
+
+PRINT WEIGHTS = 1a1.prn
+SAVE NETWORK = 1a1.wts
+RUN OUTPUT = 1a1.prn
+RUN NETWORK WITH INPUT = zero4
+RUN NETWORK WITH INPUT = one4
+ERASE NETWORK 
+
+;  We now limit the ability of the network to exactly duplicate the
+;  input data by imposing an insufficiently large hidden layer.
+;  We also make learning a little easier by linearizing the outputs.
+
+DOMAIN = REAL
+ERROR TYPE = MEAN SQUARE
+MODE = AUTOASSOCIATION
+OUTPUT ACTIVATION = LINEAR
+
+INPUTS = 6
+OUTPUTS = 6
+FIRST HIDDEN = 4
+SECOND HIDDEN = 0
+
+CUMULATE TRAINING SET = zero4
+CUMULATE TRAINING SET = one4
+
+LEARNING ALGORITHM = ANNEALING_CJ
+COMPUTE WEIGHTS 
+ERASE TRAINING SET
+
+PRINT WEIGHTS = 1a2.prn
+SAVE NETWORK = 1a2.wts
+RUN OUTPUT = 1a2.prn
+RUN NETWORK WITH INPUT = zero4
+RUN NETWORK WITH INPUT = one4
+ERASE NETWORK 
+
+
+
+

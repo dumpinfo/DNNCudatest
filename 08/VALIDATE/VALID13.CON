@@ -1,0 +1,85 @@
+;  Test various aspects of power spectrum computation and display
+
+;  Generate a noisy pure wave and an AR lag-10 series
+
+NAME = noise
+GENERATE = 1000 NORMAL 2 1.0
+NAME = wave
+GENERATE = 1000 SINE 1 20 45
+ADD = wave AND noise
+DISPLAY = wave
+
+NAME = arma
+GENERATE = 1000 ARMA 0 0 .5 0 0 0
+DISPLAY = arma
+NAME = part_arma
+COPY = arma
+DISPLAY DOMAIN = 0 100
+DISPLAY = part_arma
+DISPLAY DOMAIN = ALL
+
+; DFT spectrum tests, including DISPLAY RATE and DISPLAY DOMAIN
+
+NAME = real , imag , power , phase , dev
+SPECTRUM = wave
+
+DISPLAY = real
+DISPLAY = imag
+DISPLAY = power
+DISPLAY = phase
+DISPLAY = dev
+
+DISPLAY RATE = 10         ; Change from default rate
+DISPLAY = power
+DISPLAY DOMAIN = 39 62    ; And do a magnified display
+DISPLAY = power
+
+DISPLAY RATE = 1          ; Back to defaults for remainder of test
+DISPLAY DOMAIN = ALL
+
+;  Temporarily turn off the default data window and repeat test
+
+SPECTRUM WINDOW = NONE
+NAME = nreal , nimag , npower , nphase , ndev
+SPECTRUM = wave
+
+DISPLAY = nreal
+DISPLAY = nimag
+DISPLAY = npower
+DISPLAY = nphase
+DISPLAY = ndev
+
+SPECTRUM WINDOW = WELCH
+
+;  Test SAVGOL and MAXENT using the AR series
+
+NAME = , , arma_power , , arma_dev
+SPECTRUM = arma
+DISPLAY = arma_power
+DISPLAY = arma_dev
+
+NAME = filt_arma_power_10_2
+SAVGOL = 10 2 arma_power
+DISPLAY = filt_arma_power_10_2
+
+NAME = filt_arma_power_40_2
+SAVGOL = 40 2 arma_power
+DISPLAY = filt_arma_power_40_2
+
+NAME = filt_arma_power_40_4
+SAVGOL = 40 4 arma_power
+DISPLAY = filt_arma_power_40_4
+
+NAME = arma_maxent20
+MAXENT = 4001 20 arma
+DISPLAY = arma_maxent20
+
+NAME = arma_maxent50
+MAXENT = 4001 50 arma
+DISPLAY = arma_maxent50
+
+NAME = arma_maxent150
+MAXENT = 4001 150 arma
+DISPLAY = arma_maxent150
+
+

@@ -1,0 +1,38 @@
+; Test hybrid ARMA/neural prediction
+
+ALLOWABLE ERROR = 0.0                ; Network training parameters
+SIGMA LOW = 0.1
+SIGMA HIGH = 10.0
+SIGMA TRIES = 7
+NETWORK MODEL = PNN
+
+NAME = wave175
+GENERATE = 175 SINE 1.0 50.0 90.0    ; This is the deterministic component
+NAME = wave200                       ; that the network will find in shocks
+GENERATE = 200 SINE 1.0 50.0 90.0    ; Display it for user's information
+DISPLAY = wave200
+
+NAME = arma1                         ; This is used in tests 1 and 3
+GENERATE = 175 ARMA  -0.8 0 0 0 0 0  ; AR(1) lag 1 weight = -.8
+NAME = arma2                         ; This is used in tests 2 and 3
+GENERATE = 175 ARMA  0 0 0 -0.8 0 0  ; MA(1) lag 1 weight = -.8
+
+NAME = sig1
+ADD = wave175 AND arma1              ; Include a deterministic component
+
+NAME = sig2
+ADD = wave175 AND arma2              ; Include a deterministic component
+
+ARMA FIXED = NO
+COMMAND FILE = valid8a.con           ; Test pure AR model
+ARMA FIXED = YES
+COMMAND FILE = valid8a.con           ; Test pure AR model
+ARMA FIXED = NO
+COMMAND FILE = valid8b.con           ; Test pure MA model
+ARMA FIXED = YES
+COMMAND FILE = valid8b.con           ; Test pure MA model
+ARMA FIXED = NO
+COMMAND FILE = valid8c.con           ; Very complicated test
+ARMA FIXED = YES
+COMMAND FILE = valid8c.con           ; Very complicated test
+

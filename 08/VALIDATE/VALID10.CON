@@ -1,0 +1,186 @@
+;  Test AUTO and CROSSCORRELATION
+
+; The test series are strongly scaled and offset as additional tests
+
+NAME = x
+GENERATE = 10001 ARMA 0 0 .9 0 0 0   ; AR(1) lag-10 weight = 0.9
+SCALE = 100 x
+OFFSET = 100 x
+
+NAME = y
+GENERATE = 10001 ARMA 0 0 0 0 0 .9   ; MA(1) lag-10 weight = 0.9
+SCALE = 100 y
+OFFSET = 100 y
+
+NAME = sum
+ADD = x AND y
+SCALE = 0.0001 sum
+OFFSET = -100 sum
+
+NAME = auto_xa
+AUTOCORRELATION = 19 x
+DISPLAY = auto_xa
+
+NAME = auto_x
+AUTOCORRELATION = 99 x
+DISPLAY = auto_x
+
+NAME = auto_ya
+AUTOCORRELATION = 19 y
+DISPLAY = auto_ya
+
+NAME = auto_y
+AUTOCORRELATION = 99 y
+DISPLAY = auto_y
+
+NAME = pauto_xa
+PARTIAL AUTOCORRELATION = 19 x
+DISPLAY = pauto_xa
+
+NAME = pauto_x
+PARTIAL AUTOCORRELATION = 99 x
+DISPLAY = pauto_x
+
+NAME = pauto_ya
+PARTIAL AUTOCORRELATION = 19 y
+DISPLAY = pauto_ya
+
+NAME = pauto_y
+PARTIAL AUTOCORRELATION = 99 y
+DISPLAY = pauto_y
+
+NAME = cross_xa
+CROSSCORRELATION = 19 sum AND x
+DISPLAY = cross_xa
+
+NAME = cross_x
+CROSSCORRELATION = 99 sum AND x
+DISPLAY = cross_x
+
+NAME = cross_ya
+CROSSCORRELATION = 19 sum AND y
+DISPLAY = cross_ya
+
+NAME = cross_y
+CROSSCORRELATION = 99 sum AND y
+DISPLAY = cross_y
+
+NAME = cross_px
+PARTIAL CROSSCORRELATION = 20 sum AND x
+DISPLAY = cross_px
+
+NAME = cross_py
+PARTIAL CROSSCORRELATION = 20 sum AND y
+DISPLAY = cross_py
+
+;  Finally, verify that coefficients are correct
+
+NAME = x
+GENERATE = 100001 ARMA 0 -.7071 0 0 0 0  ; AR(1) lag-2 weight = -.7071
+
+NAME = y
+GENERATE = 100001 ARMA 0 0 0 0 -.7071 0  ; MA(1) lag-2 weight = -.7071
+
+NAME = z , zz
+GENERATE = 100001 ARMA .3 -.3 0 .2 -.2 0 ; ARMA(2,2)
+
+;  Should be -.7071  .5  -.3535  .25  etc. double spaced
+NAME = auto_xx
+AUTOCORRELATION = 19 x
+DISPLAY = auto_xx
+
+;  Should be (about) -.7071 only
+NAME = pauto_xx
+PARTIAL AUTOCORRELATION = 19 x
+DISPLAY = pauto_xx
+
+;  Should be (about) -.46666 only
+NAME = auto_yy
+AUTOCORRELATION = 19 y
+DISPLAY = auto_yy
+
+;  Should be (about) -.46666  -.2857  etc.
+NAME = pauto_yy
+PARTIAL AUTOCORRELATION = 19 y
+DISPLAY = pauto_yy
+
+NAME = auto_zz
+AUTOCORRELATION = 19 z
+DISPLAY = auto_zz
+
+NAME = pauto_zz
+PARTIAL AUTOCORRELATION = 19 z
+DISPLAY = pauto_zz
+
+;  Should be same as above
+NAME = pauto_zzz
+PARTIAL CROSSCORRELATION = 9 z AND zz
+DISPLAY = pauto_zzz
+
+;  The last weight in each model is the partial autocorrelation
+;  Compare these to the partials computed above.
+
+INPUT = x 1
+OUTPUT = x
+TRAIN ARMA = temp
+CLEAR ARMA = temp
+INPUT = x 2
+TRAIN ARMA = temp
+CLEAR ARMA = temp
+INPUT = x 3
+TRAIN ARMA = temp
+CLEAR ARMA = temp
+INPUT = x 4
+TRAIN ARMA = temp
+CLEAR ARMA = temp
+INPUT = x 5
+TRAIN ARMA = temp
+CLEAR ARMA = temp
+INPUT = x 6
+TRAIN ARMA = temp
+CLEAR ARMA = temp
+
+CLEAR INPUT LIST
+CLEAR OUTPUT LIST
+INPUT = y 1
+OUTPUT = y
+TRAIN ARMA = temp
+CLEAR ARMA = temp
+INPUT = y 2
+TRAIN ARMA = temp
+CLEAR ARMA = temp
+INPUT = y 3
+TRAIN ARMA = temp
+CLEAR ARMA = temp
+INPUT = y 4
+TRAIN ARMA = temp
+CLEAR ARMA = temp
+INPUT = y 5
+TRAIN ARMA = temp
+CLEAR ARMA = temp
+INPUT = y 6
+TRAIN ARMA = temp
+CLEAR ARMA = temp
+
+CLEAR INPUT LIST
+CLEAR OUTPUT LIST
+INPUT = z 1
+OUTPUT = z
+TRAIN ARMA = temp
+CLEAR ARMA = temp
+INPUT = z 2
+TRAIN ARMA = temp
+CLEAR ARMA = temp
+INPUT = z 3
+TRAIN ARMA = temp
+CLEAR ARMA = temp
+INPUT = z 4
+TRAIN ARMA = temp
+CLEAR ARMA = temp
+INPUT = z 5
+TRAIN ARMA = temp
+CLEAR ARMA = temp
+INPUT = z 6
+TRAIN ARMA = temp
+CLEAR ARMA = temp
+

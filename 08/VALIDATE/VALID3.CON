@@ -1,0 +1,306 @@
+;  This tests priors.  An especially educational example of the use of
+;  skewed priors with the SEPCLASS model is at the end.
+
+PROGRESS ON
+ALLOWABLE ERROR = 0.0
+
+NAME = A1                   ; Training set class 1
+GENERATE = 300 NORMAL 0 1
+NAME = A2
+GENERATE = 300 NORMAL 0 1
+NAME = B1                   ; Training set class 2
+GENERATE = 300 NORMAL 0.3 1
+NAME = B2
+GENERATE = 300 NORMAL -0.3 1
+
+NAME = AA1                  ; Test set class 1
+GENERATE = 1000 NORMAL 0 1
+NAME = AA2
+GENERATE = 1000 NORMAL 0 1
+NAME = BB1                  ; Test set class 2
+GENERATE = 1000 NORMAL 0.3 1
+NAME = BB2
+GENERATE = 1000 NORMAL -0.3 1
+
+;  Cumulate the training set
+
+INPUT = A1
+INPUT = A2
+CLASS = class1
+CUMULATE TRAINING SET
+CLEAR INPUT LIST
+INPUT = B1
+INPUT = B2
+CLASS = class2
+CUMULATE TRAINING SET
+
+;  Cumulate the test set
+
+CLEAR INPUT LIST
+INPUT = AA1
+INPUT = AA2
+CLASS = class1
+CUMULATE TEST SET
+CLEAR INPUT LIST
+INPUT = BB1
+INPUT = BB2
+CLASS = class2
+CUMULATE TEST SET
+
+SIGMA LOW = 0.1
+SIGMA HIGH = 10.0
+SIGMA TRIES = 8
+
+NETWORK MODEL = PNN
+
+;---------------------------------------
+;  This is the (poor) RECIPROCAL kernel
+;---------------------------------------
+
+KERNEL = RECIPROCAL
+TRAIN NETWORK = temp
+SAVE NETWORK = temp TO pnnr.wts
+TEST NETWORK = temp
+CLEAR NETWORK = temp
+
+;---------------------------------------
+;  This is the GAUSS kernel
+;---------------------------------------
+
+KERNEL = GAUSS
+TRAIN NETWORK = temp
+
+CLEAR INPUT LIST
+INPUT = AA1
+INPUT = AA2
+NAME = pred_pnng_1_1 , pred_pnng_1_2
+NETWORK PREDICT = 1000 temp
+DISPLAY = pred_pnng_1_1   ; Truly class 1, confidence in class 1
+DISPLAY = pred_pnng_1_2   ; Truly class 1, confidence in class 2
+
+CLEAR INPUT LIST
+INPUT = BB1
+INPUT = BB2
+NAME = pred_pnng_2_1 , pred_pnng_2_2
+NETWORK PREDICT = 1000 temp
+DISPLAY = pred_pnng_2_1   ; Truly class 2, confidence in class 1
+DISPLAY = pred_pnng_2_2   ; Truly class 2, confidence in class 2
+
+THRESHOLD = 0
+TEST NETWORK = temp
+THRESHOLD = 52
+TEST NETWORK = temp
+THRESHOLD = 55
+TEST NETWORK = temp
+THRESHOLD = 75
+TEST NETWORK = temp
+CLEAR NETWORK = temp
+
+;---------------------------------------
+;  SEPVAR model
+;---------------------------------------
+
+NETWORK MODEL = SEPVAR
+TRAIN NETWORK = temp
+SAVE NETWORK = temp TO sepvar.wts
+
+CLEAR INPUT LIST
+INPUT = AA1
+INPUT = AA2
+NAME = pred_sepvar_1_1 , pred_sepvar_1_2
+NETWORK PREDICT = 1000 temp
+DISPLAY = pred_sepvar_1_1   ; Truly class 1, confidence in class 1
+DISPLAY = pred_sepvar_1_2   ; Truly class 1, confidence in class 2
+
+CLEAR INPUT LIST
+INPUT = BB1
+INPUT = BB2
+NAME = pred_sepvar_2_1 , pred_sepvar_2_2
+NETWORK PREDICT = 1000 temp
+DISPLAY = pred_sepvar_2_1   ; Truly class 2, confidence in class 1
+DISPLAY = pred_sepvar_2_2   ; Truly class 2, confidence in class 2
+
+THRESHOLD = 0
+TEST NETWORK = temp
+THRESHOLD = 52
+TEST NETWORK = temp
+THRESHOLD = 55
+TEST NETWORK = temp
+THRESHOLD = 75
+TEST NETWORK = temp
+CLEAR NETWORK = temp
+
+;---------------------------------------
+;  SEPCLASS model
+;---------------------------------------
+
+NETWORK MODEL = SEPCLASS
+TRAIN NETWORK = temp
+SAVE NETWORK = temp TO sepcls.wts
+
+CLEAR INPUT LIST
+INPUT = AA1
+INPUT = AA2
+NAME = pred_sepclass_1_1 , pred_sepclass_1_2
+NETWORK PREDICT = 1000 temp
+DISPLAY = pred_sepclass_1_1   ; Truly class 1, confidence in class 1
+DISPLAY = pred_sepclass_1_2   ; Truly class 1, confidence in class 2
+
+CLEAR INPUT LIST
+INPUT = BB1
+INPUT = BB2
+NAME = pred_sepclass_2_1 , pred_sepclass_2_2
+NETWORK PREDICT = 1000 temp
+DISPLAY = pred_sepclass_2_1   ; Truly class 2, confidence in class 1
+DISPLAY = pred_sepclass_2_2   ; Truly class 2, confidence in class 2
+
+THRESHOLD = 0
+TEST NETWORK = temp
+THRESHOLD = 52
+TEST NETWORK = temp
+THRESHOLD = 55
+TEST NETWORK = temp
+THRESHOLD = 75
+TEST NETWORK = temp
+CLEAR NETWORK = temp
+
+;---------------------------------------
+;  Now skew the priors
+;---------------------------------------
+
+CLEAR INPUT LIST
+CLEAR TRAINING SET
+
+INPUT = A1
+INPUT = A2
+CLASS = class1
+PRIOR = .8
+CUMULATE TRAINING SET
+CLEAR INPUT LIST
+INPUT = B1
+INPUT = B2
+CLASS = class2
+PRIOR = .2
+CUMULATE TRAINING SET
+
+NETWORK MODEL = PNN
+
+;---------------------------------------
+;  This is the (poor) RECIPROCAL kernel
+;---------------------------------------
+
+KERNEL = RECIPROCAL
+TRAIN NETWORK = temp
+TEST NETWORK = temp
+CLEAR NETWORK = temp
+
+;---------------------------------------
+;  This is the GAUSS kernel
+;---------------------------------------
+
+KERNEL = GAUSS
+TRAIN NETWORK = temp
+
+CLEAR INPUT LIST
+INPUT = AA1
+INPUT = AA2
+NAME = skew_pnng_1_1 , skew_pnng_1_2
+NETWORK PREDICT = 1000 temp
+DISPLAY = skew_pnng_1_1   ; Truly class 1, confidence in class 1
+DISPLAY = skew_pnng_1_2   ; Truly class 1, confidence in class 2
+
+CLEAR INPUT LIST
+INPUT = BB1
+INPUT = BB2
+NAME = skew_pnng_2_1 , skew_pnng_2_2
+NETWORK PREDICT = 1000 temp
+DISPLAY = skew_pnng_2_1   ; Truly class 2, confidence in class 1
+DISPLAY = skew_pnng_2_2   ; Truly class 2, confidence in class 2
+
+THRESHOLD = 0
+TEST NETWORK = temp
+THRESHOLD = 52
+TEST NETWORK = temp
+THRESHOLD = 55
+TEST NETWORK = temp
+THRESHOLD = 75
+TEST NETWORK = temp
+CLEAR NETWORK = temp
+
+;---------------------------------------
+;  SEPVAR model
+;---------------------------------------
+
+NETWORK MODEL = SEPVAR
+TRAIN NETWORK = temp
+
+CLEAR INPUT LIST
+INPUT = AA1
+INPUT = AA2
+NAME = skew_sepvar_1_1 , skew_sepvar_1_2
+NETWORK PREDICT = 1000 temp
+DISPLAY = skew_sepvar_1_1   ; Truly class 1, confidence in class 1
+DISPLAY = skew_sepvar_1_2   ; Truly class 1, confidence in class 2
+
+CLEAR INPUT LIST
+INPUT = BB1
+INPUT = BB2
+NAME = skew_sepvar_2_1 , skew_sepvar_2_2
+NETWORK PREDICT = 1000 temp
+DISPLAY = skew_sepvar_2_1   ; Truly class 2, confidence in class 1
+DISPLAY = skew_sepvar_2_2   ; Truly class 2, confidence in class 2
+
+THRESHOLD = 0
+TEST NETWORK = temp
+THRESHOLD = 52
+TEST NETWORK = temp
+THRESHOLD = 55
+TEST NETWORK = temp
+THRESHOLD = 75
+TEST NETWORK = temp
+CLEAR NETWORK = temp
+
+;---------------------------------------
+;  SEPCLASS model
+;---------------------------------------
+
+;  This illustrates a vital point regarding skewed priors in the SEPCLASS model.
+;  When the training set is large and smooth and not well separated (and other
+;  times as well), there is so much leeway in choosing sigma vectors that the
+;  overall scaling of each class is optimized to reflect the makeup (cases
+;  from each class) in the training set.  This causes priors to have much
+;  less of an impact.  This happens here.  This is NOT a bug.  It is normal,
+;  correct operation.  It cannot happen in the other models because only
+;  SEPCLASS allows disparate interclass scaling.  Try repeating this test
+;  with the classes better separated (change the means of 0.3 to 2.0).
+;  In that case, things will go as expected.
+
+NETWORK MODEL = SEPCLASS
+TRAIN NETWORK = temp
+
+CLEAR INPUT LIST
+INPUT = AA1
+INPUT = AA2
+NAME = skew_sepclass_1_1 , skew_sepclass_1_2
+NETWORK PREDICT = 1000 temp
+DISPLAY = skew_sepclass_1_1   ; Truly class 1, confidence in class 1
+DISPLAY = skew_sepclass_1_2   ; Truly class 1, confidence in class 2
+
+CLEAR INPUT LIST
+INPUT = BB1
+INPUT = BB2
+NAME = skew_sepclass_2_1 , skew_sepclass_2_2
+NETWORK PREDICT = 1000 temp
+DISPLAY = skew_sepclass_2_1   ; Truly class 2, confidence in class 1
+DISPLAY = skew_sepclass_2_2   ; Truly class 2, confidence in class 2
+
+THRESHOLD = 0
+TEST NETWORK = temp
+THRESHOLD = 52
+TEST NETWORK = temp
+THRESHOLD = 55
+TEST NETWORK = temp
+THRESHOLD = 75
+TEST NETWORK = temp
+CLEAR NETWORK = temp
+

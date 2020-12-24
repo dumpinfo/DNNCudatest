@@ -1,0 +1,37 @@
+PROGRESS ON
+NETWORK MODEL = MLFN
+
+NAME = rand
+GENERATE = 160 NORMAL 10 0.05
+NAME = x
+GENERATE = 160 SINE 1 14 0
+ADD = x AND rand
+DISPLAY = x
+
+LOG = x
+DIFFERENCE = 1 x
+DISPLAY = x
+
+INPUT = x 7
+INPUT = x 14
+OUTPUT = x
+CUMULATE TRAINING SET
+
+TRAIN NETWORK = temp
+CONFIDENCE LOG = x
+CONFIDENCE DIFFERENCE = x
+
+NAME = x                      ; Needed for confidence and predict
+NETWORK CONFIDENCE = 41 temp
+NETWORK PREDICT = 200 temp
+NAME = pointwise
+NETWORK PREDICT = 200 temp
+
+DISPLAY = x
+DISPLAY = pointwise
+
+UNDO DIFFERENCE = x
+EXP = x
+
+DISPLAY CONFIDENCE = x
+

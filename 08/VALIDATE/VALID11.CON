@@ -1,0 +1,226 @@
+;  Test ARMA confidence
+
+PROGRESS ON
+ALLOWABLE ERROR = 0.0
+ACCURACY = 5
+REFINE = 3
+
+;  Test confidence for wildly incorrect model
+;  At the end of this test, also test DISPLAY DOMAIN for confidences
+
+NAME = bad
+GENERATE = 10000 NORMAL 20 1
+
+CLEAR INPUT LIST
+CLEAR OUTPUT LIST
+
+INPUT = bad 1
+OUTPUT = bad
+TRAIN ARMA = temp
+
+NAME = bad
+GENERATE = 85 NORMAL -10 1
+
+ARMA CONFIDENCE = 16 temp
+NAME = bad
+ARMA PREDICT = 101 temp
+CLEAR ARMA = temp
+
+DISPLAY RATE = 0.1
+DISPLAY DOMAIN = 70 90
+DISPLAY CONFIDENCE = bad
+
+DISPLAY DOMAIN = ALL
+DISPLAY RATE = 1.0
+
+;  Test individual compensation for differencing and transforms
+
+CLEAR INPUT LIST
+CLEAR OUTPUT LIST
+
+NAME = x
+GENERATE = 76 NORMAL 10 1
+NAME = nt1, ct1, no1, co1, nd1, cd1, nd3, cd3, ns, cs, nlog, clog
+COPY = x
+DETREND = nt1
+DETREND = ct1
+OFFSET = -100 no1
+OFFSET = -100 co1
+DIFFERENCE = 1 nd1
+DIFFERENCE = 1 cd1
+DIFFERENCE = 3 nd3
+DIFFERENCE = 3 cd3
+SEASONAL DIFFERENCE = 10 ns
+SEASONAL DIFFERENCE = 10 cs
+LOG = nlog
+LOG = clog
+
+INPUT = x 1
+OUTPUT = x
+OUTPUT = nt1
+OUTPUT = ct1
+OUTPUT = no1
+OUTPUT = co1
+OUTPUT = nd1
+OUTPUT = cd1
+OUTPUT = nd3
+OUTPUT = cd3
+OUTPUT = ns
+OUTPUT = cs
+OUTPUT = nlog
+OUTPUT = clog
+TRAIN ARMA = temp
+
+CONFIDENCE DETREND = ct1
+CONFIDENCE OFFSET = co1
+CONFIDENCE DIFFERENCE = cd1
+CONFIDENCE DIFFERENCE = cd3
+CONFIDENCE SEASONAL DIFFERENCE = cs
+CONFIDENCE LOG = clog
+
+ARMA CONFIDENCE = 14 temp
+NAME = x , nt1, ct1, no1, co1, nd1, cd1, nd3, cd3, ns, cs, nlog, clog
+ARMA PREDICT = 91 temp
+CLEAR ARMA = temp
+
+UNDO DETREND = ct1
+UNDO OFFSET = co1
+UNDO DIFFERENCE = cd1
+UNDO DIFFERENCE = cd3
+UNDO SEASONAL DIFFERENCE = cs
+EXP = clog
+
+DISPLAY CONFIDENCE = x
+DISPLAY CONFIDENCE = nt1
+DISPLAY CONFIDENCE = ct1
+DISPLAY CONFIDENCE = no1
+DISPLAY CONFIDENCE = co1
+DISPLAY CONFIDENCE = nd1
+DISPLAY CONFIDENCE = cd1
+DISPLAY CONFIDENCE = nd3
+DISPLAY CONFIDENCE = cd3
+DISPLAY CONFIDENCE = ns
+DISPLAY CONFIDENCE = cs
+DISPLAY CONFIDENCE = nlog
+DISPLAY CONFIDENCE = clog
+
+;  Now straight tests
+
+NAME = a , a1 , a2
+GENERATE = 85 ARMA  -.8 0 0  0 0 0
+NAME = b , b1 , b2
+GENERATE = 85 ARMA  0 0 -.8  0 0 0
+NAME = c , c1 , c2
+GENERATE = 85 ARMA  0 0 0  -.8 0 0
+NAME = d , d1 , d2
+GENERATE = 85 ARMA  0 0 0  0 0 -.8
+
+; Test each individual series
+
+CLEAR INPUT LIST
+CLEAR OUTPUT LIST
+
+INPUT = a 1
+OUTPUT = a
+TRAIN ARMA = temp
+ARMA CONFIDENCE = 16 temp
+NAME = a
+ARMA PREDICT = 101 temp
+DISPLAY CONFIDENCE = a
+CLEAR ARMA = temp
+
+CLEAR INPUT LIST
+CLEAR OUTPUT LIST
+INPUT = b 10
+OUTPUT = b
+TRAIN ARMA = temp
+ARMA CONFIDENCE = 16 temp
+NAME = b
+ARMA PREDICT = 101 temp
+DISPLAY CONFIDENCE = b
+CLEAR ARMA = temp
+
+CLEAR INPUT LIST
+CLEAR OUTPUT LIST
+
+OUTPUT = c 1
+TRAIN ARMA = temp
+ARMA CONFIDENCE = 16 temp
+NAME = c
+ARMA PREDICT = 101 temp
+DISPLAY CONFIDENCE = c
+CLEAR ARMA = temp
+
+CLEAR INPUT LIST
+CLEAR OUTPUT LIST
+
+OUTPUT = d 10
+TRAIN ARMA = temp
+ARMA CONFIDENCE = 16 temp
+NAME = d
+ARMA PREDICT = 101 temp
+DISPLAY CONFIDENCE = d
+CLEAR ARMA = temp
+
+CLEAR INPUT LIST
+CLEAR OUTPUT LIST
+
+; Now do a multivariate test
+
+NAME = x1 , x2
+GENERATE = 85 NORMAL ( 76.0 , 76.0 )
+NAME = y1 , y2
+GENERATE = 85 NORMAL ( 76.0 , 0.01 )
+
+INPUT = a1 1
+INPUT = b1 10
+INPUT = x1 6-7
+OUTPUT = a1
+OUTPUT = b1
+OUTPUT = c1 1
+OUTPUT = d1 10
+OUTPUT = y1 3-4
+
+TRAIN ARMA = temp
+ARMA CONFIDENCE = 16 temp
+NAME = a1 , b1 , c1 , d1 , y1
+ARMA PREDICT = 101 temp
+DISPLAY CONFIDENCE = a1
+DISPLAY CONFIDENCE = b1
+DISPLAY CONFIDENCE = c1
+DISPLAY CONFIDENCE = d1
+DISPLAY CONFIDENCE = y1
+CLEAR ARMA = temp
+
+;  Repeat the multivariate test, shuffled.
+
+;  This error surface has many local minima because there are many MA terms
+;  and little data.  Do not be surprised to get quite different results.
+;  However, in both this test and the previous test, the single term in each
+;  a, b, c, and d output corresponding to the true term should at least be
+;  somewhat near its true value of -0.8, with all other terms small.
+;  (But remember that the variance of Y is tiny, so expect large weights
+;  for it.)
+
+CLEAR INPUT LIST
+CLEAR OUTPUT LIST
+
+OUTPUT = y2 3-4
+OUTPUT = d2 10
+OUTPUT = c2 1
+OUTPUT = b2
+OUTPUT = a2
+INPUT = x2 6-7
+INPUT = b2 10
+INPUT = a2 1
+
+TRAIN ARMA = temp
+ARMA CONFIDENCE = 16 temp
+NAME = y2 , d2 , c2 , b2 , a2
+ARMA PREDICT = 101 temp
+DISPLAY CONFIDENCE = a2
+DISPLAY CONFIDENCE = b2
+DISPLAY CONFIDENCE = c2
+DISPLAY CONFIDENCE = d2
+DISPLAY CONFIDENCE = y2
+

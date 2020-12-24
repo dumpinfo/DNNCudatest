@@ -1,0 +1,381 @@
+;  Test neural network confidence.
+;  Network confidence requires that NAMES be specified before CONFIDENCE.
+;  This is unlike ARMA confidence, which automatically does all outputs.
+;  Beware of weird results when the length of the series is at or near
+;  a multiple of the period (or very long):  For a perfect dataset
+;  the training algorithm computes a tiny sigma.  When the
+;  confidence routine goes into recursion, the tiny lack of fit becomes
+;  so grossly exagerated that the net reverts to predicting the mean of
+;  each series, which tends strongly toward zero.  The result is that
+;  the first few predictions (before recursion starts) are perfect, while
+;  subsequent predictions are terrible.
+;  Even the randomized test at the end does no good if the SEPVAR model
+;  is used, because the training algorithm simply drives up its weight
+;  so high that the random input is ignored.  Use the PNN model!
+
+PROGRESS ON
+
+;  Do a wild bivariate perfect prediction test of many transforms.
+;  Note that this combination of operations was carefully selected to
+;  preserve perfection.  Even a simple pair like (DIFFERENCE 2, DETREND) will
+;  shatter perfection due to DETREND inducing a false trend!
+
+NAME = sine
+GENERATE = 135 SINE ( 1.0 , 15 , 0.0 )
+NAME = cosine
+GENERATE = 138 SINE ( 1.0 , 15 , 90.0 )
+
+STANDARDIZE = sine
+SEASONAL DIFFERENCE = 10 cosine
+OFFSET = 40.0 cosine
+LOG = cosine
+OFFSET = 10.0 sine
+LOG = sine
+CENTER = sine
+STANDARDIZE = cosine
+SCALE = 100.0 sine
+SCALE = 100.0 cosine
+DIFFERENCE = 1 cosine
+DETREND = sine
+DIFFERENCE = 2 sine
+SEASONAL DIFFERENCE = 14 sine
+DETREND = cosine
+CENTER = cosine
+
+INPUT = sine 1-2
+INPUT = cosine 1-2
+OUTPUT = sine
+OUTPUT = cosine
+CUMULATE TRAINING SET
+
+NETWORK MODEL = PNN
+TRAIN NETWORK = temp
+
+CONFIDENCE STANDARDIZE = sine
+CONFIDENCE SEASONAL DIFFERENCE = cosine
+CONFIDENCE OFFSET = cosine
+CONFIDENCE LOG = cosine
+CONFIDENCE OFFSET = sine
+CONFIDENCE LOG = sine
+CONFIDENCE CENTER = sine
+CONFIDENCE STANDARDIZE = cosine
+CONFIDENCE SCALE = sine
+CONFIDENCE SCALE = cosine
+CONFIDENCE DIFFERENCE = cosine
+CONFIDENCE DETREND = sine
+CONFIDENCE DIFFERENCE = sine
+CONFIDENCE SEASONAL DIFFERENCE = sine
+CONFIDENCE DETREND = cosine
+CONFIDENCE CENTER = cosine
+
+NAME = sine , cosine
+NETWORK CONFIDENCE = 66 temp
+NETWORK PREDICT = 185 temp
+
+UNDO CENTER = cosine
+UNDO DETREND = cosine
+UNDO SEASONAL DIFFERENCE = sine
+UNDO DIFFERENCE = sine
+UNDO DETREND = sine
+UNDO DIFFERENCE = cosine
+UNDO SCALE = cosine
+UNDO SCALE = sine
+UNDO STANDARDIZE = cosine
+UNDO CENTER = sine
+EXP = sine
+UNDO OFFSET = sine
+EXP = cosine
+UNDO OFFSET = cosine
+UNDO SEASONAL DIFFERENCE = cosine
+UNDO STANDARDIZE = sine
+
+DISPLAY CONFIDENCE = sine
+DISPLAY CONFIDENCE = cosine
+
+;  Test individual compensation for differencing and transforms
+
+CLEAR NETWORK = temp
+CLEAR INPUT LIST
+CLEAR OUTPUT LIST
+CLEAR TRAINING SET
+
+NAME = t
+GENERATE = 76 NORMAL 40 1
+NAME = x
+GENERATE = 76 NORMAL 10 1
+NAME = nt1, ct1, no1, co1, nd1, cd1, nd3, cd3, ns, cs, nlog, clog
+COPY = x
+DETREND = nt1
+DETREND = ct1
+OFFSET = -100 no1
+OFFSET = -100 co1
+DIFFERENCE = 1 nd1
+DIFFERENCE = 1 cd1
+DIFFERENCE = 3 nd3
+DIFFERENCE = 3 cd3
+SEASONAL DIFFERENCE = 10 ns
+SEASONAL DIFFERENCE = 10 cs
+LOG = nlog
+LOG = clog
+
+INPUT = t 1
+OUTPUT = x
+OUTPUT = nt1
+OUTPUT = ct1
+OUTPUT = no1
+OUTPUT = co1
+OUTPUT = nd1
+OUTPUT = cd1
+OUTPUT = nd3
+OUTPUT = cd3
+OUTPUT = ns
+OUTPUT = cs
+OUTPUT = nlog
+OUTPUT = clog
+CUMULATE TRAINING SET
+
+NETWORK MODEL = PNN
+TRAIN NETWORK = comp
+
+CONFIDENCE DETREND = ct1
+CONFIDENCE OFFSET = co1
+CONFIDENCE DIFFERENCE = cd1
+CONFIDENCE DIFFERENCE = cd3
+CONFIDENCE SEASONAL DIFFERENCE = cs
+CONFIDENCE LOG = clog
+
+NAME = x , nt1, ct1, no1, co1, nd1, cd1, nd3, cd3, ns, cs, nlog, clog
+NETWORK CONFIDENCE = 14 comp
+NETWORK PREDICT = 91 comp
+CLEAR NETWORK = comp
+
+UNDO DETREND = ct1
+UNDO OFFSET = co1
+UNDO DIFFERENCE = cd1
+UNDO DIFFERENCE = cd3
+UNDO SEASONAL DIFFERENCE = cs
+EXP = clog
+
+DISPLAY CONFIDENCE = x
+DISPLAY CONFIDENCE = nt1
+DISPLAY CONFIDENCE = ct1
+DISPLAY CONFIDENCE = no1
+DISPLAY CONFIDENCE = co1
+DISPLAY CONFIDENCE = nd1
+DISPLAY CONFIDENCE = cd1
+DISPLAY CONFIDENCE = nd3
+DISPLAY CONFIDENCE = cd3
+DISPLAY CONFIDENCE = ns
+DISPLAY CONFIDENCE = cs
+DISPLAY CONFIDENCE = nlog
+DISPLAY CONFIDENCE = clog
+
+;  Now test straight prediction confidence
+
+NAME = sinewave1 , sinewave2 , sinewave3 , sinewave4
+GENERATE = 135 SINE ( 1.0 , 15 , 0.0 )
+
+NAME = coswave1 , coswave2 , coswave3 , coswave4
+GENERATE = 135 SINE ( 1.0 , 15 , 90.0 )
+
+NAME = invertwave3 , invertwave4
+GENERATE = 135 SINE ( 1.0 , 15 , 180.0 )
+
+NAME = funnywave3 , funnywave4
+GENERATE = 135 SINE ( 1.0 , 15 , 20.0 )
+
+NAME = random1
+GENERATE = 135 NORMAL 0 1
+ADD = random1 AND sinewave1
+
+NAME = random2a , random2b
+GENERATE = 135 NORMAL 0 1
+ADD = random2a AND sinewave1
+
+NAME = random4
+GENERATE = 135 NORMAL 100 1.5
+
+;  Start out simple.  Predict the current value from lags of 1 and 2.
+;  This prediction can be done exactly.
+
+CLEAR INPUT LIST
+CLEAR OUTPUT LIST
+CLEAR TRAINING SET
+
+INPUT = sinewave1 1-2     ; These are the two lags that serve as input
+OUTPUT = sinewave1        ; This is the current value, the output
+CUMULATE TRAINING SET
+
+NETWORK MODEL = PNN
+TRAIN NETWORK = pnn_lag_1_2_lead_0
+
+NAME = sinewave1
+NETWORK CONFIDENCE = 16 pnn_lag_1_2_lead_0
+NETWORK PREDICT = 151 pnn_lag_1_2_lead_0
+DISPLAY CONFIDENCE = sinewave1
+
+;  Now do essentially the same thing, but in a different way.
+;  Use the current and previous values to predict one ahead.
+
+CLEAR INPUT LIST
+CLEAR OUTPUT LIST
+CLEAR TRAINING SET
+
+INPUT = coswave1 0-1     ; These are the current and lagged values for input
+OUTPUT = coswave1 1      ; This is the lead-one value, the output
+CUMULATE TRAINING SET
+
+NETWORK MODEL = PNN
+TRAIN NETWORK = pnn_lag_0_1_lead_1
+
+NAME = coswave1
+NETWORK CONFIDENCE = 16 pnn_lag_0_1_lead_1
+NETWORK PREDICT = 151 pnn_lag_0_1_lead_1
+DISPLAY CONFIDENCE = coswave1
+
+;  Repeat the previous two operations, except this time use a randomized
+;  series so that exact prediction is impossible.
+;  We should get the same results both ways!
+
+CLEAR INPUT LIST
+CLEAR OUTPUT LIST
+CLEAR TRAINING SET
+CLEAR NETWORKS
+
+INPUT = random1 1-2     ; These are the two lags that serve as input
+OUTPUT = random1        ; This is the current value, the output
+CUMULATE TRAINING SET
+
+NETWORK MODEL = PNN
+TRAIN NETWORK = pnn_lag_1_2_lead_0
+
+CLEAR INPUT LIST
+INPUT = random2a 1-2
+OUTPUT = random2a       ; Causes PREDICT to preserve known series in output
+NAME = random2a
+NETWORK CONFIDENCE = 16 pnn_lag_1_2_lead_0
+NETWORK PREDICT = 151 pnn_lag_1_2_lead_0
+DISPLAY CONFIDENCE = random2a
+
+CLEAR INPUT LIST        ; Repeat above
+CLEAR OUTPUT LIST
+CLEAR TRAINING SET
+
+INPUT = random1 0-1     ; These are the current and lagged values for input
+OUTPUT = random1 1      ; This is the lead-one value, the output
+CUMULATE TRAINING SET
+
+NETWORK MODEL = PNN
+TRAIN NETWORK = pnn_lag_0_1_lead_1
+
+CLEAR INPUT LIST
+INPUT = random2b 0-1
+NAME = random2b
+OUTPUT = random2b
+NETWORK CONFIDENCE = 16 pnn_lag_0_1_lead_1
+NETWORK PREDICT = 151 pnn_lag_0_1_lead_1
+DISPLAY CONFIDENCE = random2b
+
+;  The easy stuff is done.  Now get complicated.  Use both sine and cosine.
+
+CLEAR NETWORKS
+CLEAR INPUT LIST
+CLEAR OUTPUT LIST
+CLEAR TRAINING SET
+
+
+INPUT = sinewave2 1-2     ; These are the two lags that serve as input
+INPUT = coswave2 0-1      ; These are the current and lagged values for input
+OUTPUT = sinewave2
+OUTPUT = coswave2 1
+CUMULATE TRAINING SET
+
+NETWORK MODEL = PNN
+TRAIN NETWORK = pnn_both
+
+NAME = sinewave2 , coswave2
+NETWORK CONFIDENCE = 16 pnn_both
+NETWORK PREDICT = 151 pnn_both
+DISPLAY CONFIDENCE = sinewave2
+DISPLAY CONFIDENCE = coswave2
+
+;  Add a third prediction and predictor.
+;  Note that the bizarre glitch at case 137 is NOT a bug.  It arises from
+;  a freak event: This dataset causes the sigma to be large enough to
+;  attract several neighbors.  Shortly after funnywave expires (it is not
+;  recursive), the net gives an erroneous prediction.  But then several
+;  cases later it gets on track again.  A longer prediction length would
+;  demonstrate that this error repeats as expected.  The normal expectation
+;  in a case like this is for the prediction to fixate at a constant value
+;  once any nonrecursive series expires.  This is why we always want to
+;  avoid that situation!  But in this highly unusual situation this happens.
+
+CLEAR NETWORKS
+CLEAR INPUT LIST
+CLEAR OUTPUT LIST
+CLEAR TRAINING SET
+
+INPUT = sinewave3 1-2
+INPUT = coswave3 0-1
+INPUT = funnywave3 1
+OUTPUT = sinewave3
+OUTPUT = coswave3 1
+OUTPUT = invertwave3 3
+CUMULATE TRAINING SET
+
+NETWORK MODEL = PNN
+TRAIN NETWORK = pnn_third
+
+NAME = sinewave3 , coswave3 , invertwave3
+NETWORK CONFIDENCE = 16 pnn_third
+NETWORK PREDICT = 151 pnn_third
+DISPLAY CONFIDENCE = sinewave3
+DISPLAY CONFIDENCE = coswave3
+DISPLAY CONFIDENCE = invertwave3
+
+;  Finally, add one more input and output, and make it fully recursive
+;  to avoid the exceedingly funny stuff associated with a nonrecursive
+;  input expiring.
+;  The new input/output is random to prevent perfection.
+;  Note that random4 should have equal confidence at all distances since
+;  it is not related to any inputs.
+
+CLEAR NETWORKS
+CLEAR INPUT LIST
+CLEAR OUTPUT LIST
+CLEAR TRAINING SET
+
+INPUT = sinewave4 1-2
+INPUT = coswave4 0-1
+INPUT = random4 2
+OUTPUT = sinewave4
+OUTPUT = coswave4 1
+OUTPUT = invertwave4 3
+OUTPUT = random4 4
+CUMULATE TRAINING SET
+
+NETWORK MODEL = PNN
+TRAIN NETWORK = pnn_third
+
+NAME = random4                 ; Avoid duplication in the training set
+GENERATE = 135 NORMAL 100 1.5
+
+NAME = sinewave4 , coswave4 , invertwave4 , random4
+NETWORK CONFIDENCE = 66 pnn_third
+NETWORK PREDICT = 201 pnn_third
+
+DISPLAY CONFIDENCE = sinewave4
+DISPLAY CONFIDENCE = coswave4
+DISPLAY CONFIDENCE = invertwave4
+DISPLAY CONFIDENCE = random4
+
+NAME = temp
+COPY = -101 sinewave4
+DISPLAY = temp
+NAME = true
+GENERATE = 201 SINE ( 1.0 , 15 , 0.0 )
+COPY = -101 true
+NAME = error
+SUBTRACT = true AND temp
+DISPLAY = error
+

@@ -1,0 +1,280 @@
+Directory of D:\PREDICT\DISK
+
+.            <DIR>         06-09-95  11:32a
+..           <DIR>         06-09-95  11:32a
+COMMON       <DIR>         06-09-95  11:34a
+DOS          <DIR>         06-09-95  11:36a
+EXAMPLES     <DIR>         06-09-95  11:41a
+FINANCE      <DIR>         06-09-95  11:43a
+SUNSPOT      <DIR>         06-09-95  11:45a
+VALIDATE     <DIR>         06-09-95  11:40a
+WEATHER      <DIR>         06-09-95  11:44a
+WINDOWS      <DIR>         06-09-95  11:38a
+READ     ME          1,843 06-10-95  11:43a
+TEMP                     0 06-11-95   9:05a
+       12 file(s)          1,843 bytes
+
+Directory of D:\PREDICT\DISK\COMMON
+
+.            <DIR>         06-09-95  11:34a
+..           <DIR>         06-09-95  11:34a
+MRFFT_K  ASM        49,606 06-10-95  11:34a
+COMPALLB BAT         2,811 06-10-95  11:09a
+COMPALLS BAT         4,840 04-26-95   8:07p
+MRFFT_K  C          16,774 06-10-95  11:32a
+ACTIVITY CPP         6,233 06-09-95  12:20p
+ACT_FUNC CPP         2,722 06-09-95  12:21p
+ANNEAL1  CPP         5,964 06-09-95  12:21p
+ANNEAL2  CPP         9,295 06-09-95  12:21p
+ANX      CPP         8,886 06-09-95  12:21p
+ANX_DD   CPP        20,641 06-09-95  12:21p
+ARMA     CPP        28,309 06-09-95  12:22p
+ARMACONF CPP        12,192 06-09-95  12:22p
+ARMAPRED CPP         8,661 06-09-95  12:22p
+ARMASAVE CPP         7,439 06-09-95  12:22p
+AUTOCORR CPP        10,775 06-09-95  12:22p
+BRENTMIN CPP         7,409 06-09-95  12:22p
+BURG     CPP         3,402 06-09-95  12:22p
+COMBINE  CPP         6,273 06-09-95  12:22p
+CONJGRAD CPP        11,667 06-09-95  12:22p
+CONTROL  CPP        18,457 06-09-95  12:22p
+COPY     CPP         6,199 06-09-95  12:22p
+CVTRAIN  CPP         5,313 06-09-95  12:22p
+DEFAULTS CPP         4,840 06-09-95  12:22p
+DERMIN   CPP        14,723 06-09-95  12:22p
+DOTPROD  CPP         2,110 06-09-95  12:22p
+DOTPRODC CPP         3,991 06-09-95  12:22p
+EIGEN    CPP        36,196 06-09-95  12:22p
+FILTER   CPP        11,071 06-09-95  12:22p
+FILT_SIG CPP         6,217 06-09-95  12:22p
+FLRAND   CPP         7,756 06-09-95  12:22p
+GENERATE CPP         8,431 06-09-95  12:22p
+GLOB_MIN CPP         8,485 06-09-95  12:22p
+GRADIENT CPP        22,267 06-09-95  12:22p
+GRAPHLAB CPP         4,682 06-09-95  12:25p
+IN_OUT   CPP         5,842 06-09-95  12:23p
+LEV_MARQ CPP         9,068 06-09-95  12:23p
+LIMIT    CPP         1,846 06-09-95  12:23p
+LM_CORE  CPP        26,733 06-09-95  12:23p
+MAXENT   CPP         6,862 06-09-95  12:23p
+MEM      CPP         6,333 06-09-95  12:23p
+MLFN     CPP        21,966 06-09-95  12:23p
+MORLET   CPP         7,925 06-09-95   3:46p
+MOV_AVG  CPP         6,741 06-09-95  12:23p
+MRFFT    CPP        14,948 06-09-95  12:23p
+MRFFT_P  CPP         8,332 06-09-95  12:23p
+NETWORK  CPP         4,965 06-09-95  12:23p
+NET_CONF CPP        15,414 06-09-95  12:23p
+NET_PRED CPP        14,737 06-09-95  12:23p
+NP_CONF  CPP        24,092 06-09-95  12:23p
+ORTHOG   CPP        14,253 06-09-95  12:23p
+ORTHSAVE CPP         6,596 06-09-95  12:23p
+PARSDUBL CPP         2,549 06-09-95  12:23p
+PNNBASIC CPP        14,739 06-09-95  12:23p
+PNNET    CPP         8,048 06-09-95  12:23p
+POWELL   CPP        13,608 06-09-95  12:23p
+PROCESS  CPP       187,745 06-09-95  12:23p
+QMF_SIG  CPP         7,925 06-09-95   3:47p
+QSORT    CPP         2,297 06-09-95  12:23p
+RANDOM   CPP         6,078 06-09-95  12:23p
+READSIG  CPP         8,471 06-09-95  12:23p
+REGRESS  CPP        14,157 06-09-95  12:23p
+REGRS_DD CPP         8,620 06-09-95  12:23p
+SAVGOL   CPP         7,662 06-09-95  12:23p
+SEPCLASS CPP        27,835 06-09-95  12:24p
+SEPVAR   CPP        31,326 06-09-95  12:24p
+SHAKE    CPP         2,033 06-09-95  12:24p
+SIGNAL   CPP        12,695 06-09-95  12:24p
+SIG_SAVE CPP         2,323 06-09-95  12:24p
+SPECTRUM CPP        12,566 06-09-95   3:45p
+SSG      CPP        11,238 06-09-95  12:24p
+SSG_CORE CPP        10,720 06-09-95  12:24p
+STRINGS  CPP         3,873 06-09-95  12:24p
+SVDCMP   CPP        16,484 06-09-95  12:24p
+TESTNET  CPP        11,868 06-09-95  12:24p
+TRAIN    CPP        13,557 06-09-95  12:24p
+VECLEN   CPP         1,768 06-09-95  12:24p
+WT_SAVE  CPP        10,015 06-09-95  12:24p
+CLASSES  H          30,819 06-09-95  12:20p
+CONST    H           8,880 06-09-95  12:20p
+FUNCDEFS H          11,625 06-06-95   7:01a
+COMMON   RSP           584 04-26-95   8:07p
+       83 file(s)      1,083,398 bytes
+
+Directory of D:\PREDICT\DISK\DOS
+
+.            <DIR>         06-09-95  11:36a
+..           <DIR>         06-09-95  11:36a
+COMPALLS BAT           368 06-09-95  12:00p
+PL       BAT            67 06-09-95  11:59a
+DISPLAY  CPP        14,335 06-09-95  12:26p
+GRAPHICS CPP         6,326 06-09-95  12:26p
+NPREDICT CPP         6,426 06-09-95  12:26p
+PROG_WIN CPP         2,692 06-09-95  12:26p
+NPREDICT EXE       462,289 06-09-95   3:49p
+NPREDICT LNK         1,488 06-09-95  11:59a
+       10 file(s)        493,991 bytes
+
+Directory of D:\PREDICT\DISK\EXAMPLES
+
+.            <DIR>         06-09-95  11:41a
+..           <DIR>         06-09-95  11:41a
+ARMACONF CON           507 05-19-95   2:54p
+ARMA_NN  CON         2,166 05-08-95   2:08p
+NET_CONF CON           595 05-19-95   2:55p
+NNPRED   CON           436 11-21-94   4:21p
+ORTHOG   CON         2,207 01-04-95   5:35p
+PREDPREC CON        14,100 06-10-95  12:05p
+QMF_DIFF CON         4,897 05-19-95   3:18p
+        9 file(s)         24,908 bytes
+
+Directory of D:\PREDICT\DISK\FINANCE
+
+.            <DIR>         06-09-95  11:43a
+..           <DIR>         06-09-95  11:43a
+BKACCEPT DAT        13,611 01-28-95   7:26a
+EURO     DAT         4,516 01-26-95   8:44a
+LTGOVTBD DAT        19,153 04-12-95   3:52p
+M1NS     DAT         9,073 01-26-95   8:50a
+M2NS     DAT         9,073 01-26-95   8:49a
+M3NS     DAT         9,073 01-26-95   8:50a
+TB3MA    DAT        16,129 04-04-95   4:03p
+TD3MO    DAT        15,373 06-10-95   9:01a
+READ     ME          1,370 05-08-95   4:52p
+       11 file(s)         97,371 bytes
+
+Directory of D:\PREDICT\DISK\SUNSPOT
+
+.            <DIR>         06-09-95  11:45a
+..           <DIR>         06-09-95  11:45a
+SUNSPOT  DAT         8,120 05-08-95   4:20p
+READ     ME            558 05-08-95   4:36p
+        4 file(s)          8,678 bytes
+
+Directory of D:\PREDICT\DISK\VALIDATE
+
+.            <DIR>         06-09-95  11:40a
+..           <DIR>         06-09-95  11:40a
+VALID1   CON         8,369 05-15-95   9:11a
+VALID10  CON         3,475 05-16-95  10:54a
+VALID11  CON         4,504 05-16-95   1:39p
+VALID12  CON        10,238 03-13-95  12:23p
+VALID13  CON         1,771 03-24-95   8:24a
+VALID14  CON         2,425 05-16-95   2:09p
+VALID2   CON         8,394 05-15-95   9:12a
+VALID3   CON         7,691 05-20-95   8:55a
+VALID4   CON         8,301 06-10-95   3:40p
+VALID5   CON         5,219 05-16-95   7:52a
+VALID6   CON         3,409 05-22-95   3:41p
+VALID7   CON         4,522 05-15-95   9:23a
+VALID8   CON         1,364 05-16-95   9:28a
+VALID8A  CON         1,650 12-14-94   8:08a
+VALID8B  CON         1,656 12-16-94   9:47a
+VALID8C  CON         2,775 12-17-94   9:12a
+VALID9   CON         3,996 01-04-95  10:53a
+CLASS1   DAT           673 10-31-94   9:04a
+CLASS2   DAT           673 10-31-94   9:04a
+       21 file(s)         81,105 bytes
+
+Directory of D:\PREDICT\DISK\WEATHER
+
+.            <DIR>         06-09-95  11:44a
+..           <DIR>         06-09-95  11:44a
+PREC     CA         50,347 04-07-95   7:01p
+TEMP     CA         58,138 04-07-95   6:27p
+PREC     GA         61,733 04-07-95   6:59p
+TEMP     GA         71,818 04-07-95   6:55p
+PREC     IN         61,604 04-07-95   6:59p
+TEMP     IN         71,815 04-07-95   7:04p
+PREC     KS         61,598 04-07-95   6:58p
+TEMP     KS         71,818 04-07-95   6:43p
+PREC     ME         27,371 04-07-95   7:02p
+READ     ME          2,940 05-09-95   1:04p
+TEMP     ME         30,715 04-07-95   7:06p
+PREC     MI         67,264 04-07-95   6:57p
+TEMP     MI         78,585 04-07-95   7:06p
+PREC     MN         61,560 04-07-95   6:58p
+TEMP     MN         71,041 04-07-95   6:41p
+PREC     NM         55,858 04-07-95   7:00p
+TEMP     NM         64,978 04-07-95   7:01p
+PREC     NY         67,274 04-07-95   7:02p
+TEMP     NY         78,576 04-02-95   6:44p
+PREC     TN         33,137 04-07-95   6:58p
+TEMP     TN         37,618 04-07-95   6:44p
+PREC     TX         67,324 04-07-95   7:01p
+TEMP     TX         78,658 04-07-95   6:30p
+PREC     WA         68,055 04-07-95   7:01p
+TEMP     WA         78,650 04-07-95   6:26p
+       27 file(s)      1,478,475 bytes
+
+Directory of D:\PREDICT\DISK\WINDOWS
+
+.            <DIR>         06-09-95  11:38a
+..           <DIR>         06-09-95  11:38a
+ARITH    CPP         4,891 06-09-95  12:30p
+ARMA     CPP        14,764 06-09-95  12:30p
+CLEAR    CPP         8,445 06-09-95  12:30p
+COM_FILE CPP         7,261 06-09-95  12:30p
+CONFCOMP CPP         6,879 06-09-95  12:30p
+COPY     CPP         5,000 06-09-95  12:30p
+CUMULATE CPP         4,327 06-09-95  12:30p
+DISP     CPP         9,206 06-09-95  12:30p
+DISPLAY  CPP        23,564 06-09-95  12:30p
+FILTER   CPP        10,510 06-09-95  12:30p
+GENERATE CPP        16,236 06-09-95  12:30p
+IN_OUT   CPP         7,199 06-09-95  12:30p
+LAG_CORR CPP         6,093 06-09-95  12:30p
+MODIFY   CPP        15,282 06-09-95  12:30p
+NETMODEL CPP        11,228 06-09-95  12:30p
+NET_PRED CPP         6,609 06-09-95  12:30p
+NET_TRN  CPP        47,586 06-09-95  12:30p
+ORTHOG   CPP         8,924 06-09-95  12:30p
+PRDCMDI1 CPP         3,722 06-09-95  12:30p
+PRDCMDIC CPP         3,270 06-09-95  12:30p
+PRDCTAPP CPP        12,375 06-09-95  12:30p
+PROG_WIN CPP         7,087 06-09-95  12:30p
+READSAVE CPP        21,516 06-09-95  12:30p
+SPECTRUM CPP         6,855 06-09-95  12:30p
+TEST_NET CPP         4,626 06-09-95  12:30p
+TEXTLIST CPP         2,961 06-09-95  12:30p
+PRDCTAPP DEF           537 06-08-95   3:11p
+NPREDICT EXE       630,784 06-10-95  11:18a
+ARITH    H           1,461 06-09-95  12:28p
+ARMA     H           3,570 06-09-95  12:28p
+CLEAR    H           1,883 06-09-95  12:28p
+COM_FILE H           1,434 06-09-95  12:28p
+CONFCOMP H           1,658 06-09-95  12:28p
+COPY     H           1,470 06-09-95  12:28p
+CUMULATE H           1,318 06-09-95  12:29p
+DISP     H           1,941 06-09-95  12:29p
+EXTERN   H             901 06-09-95  12:29p
+FILTER   H           1,943 06-09-95  12:29p
+GENERATE H           2,360 06-09-95  12:29p
+IN_OUT   H           1,731 06-09-95  12:29p
+LAG_CORR H           1,575 06-09-95  12:29p
+MODIFY   H           2,053 06-09-95  12:29p
+NETMODEL H           1,763 06-09-95  12:29p
+NET_PRED H           1,719 06-09-95  12:29p
+NET_TRN  H           4,782 06-09-95  12:29p
+ORTHOG   H           2,355 06-09-95  12:29p
+PRDCMDI1 H           2,097 06-09-95  12:29p
+PRDCMDIC H           1,281 06-09-95  12:29p
+PRDCTAPP H           2,093 06-09-95  12:29p
+PROG_WIN H           1,376 06-09-95  12:29p
+READSAVE H           4,831 06-09-95  12:29p
+SPECTRUM H           1,679 06-09-95  12:29p
+TEST_NET H           1,410 06-09-95  12:29p
+TEXTLIST H           1,281 06-09-95  12:29p
+APPLMDI  ICO         1,086 09-22-94   9:32a
+COMMAND  ICO           766 05-22-95  10:15a
+MDICHILD ICO         1,086 09-22-94   9:32a
+PROGRESS ICO           766 05-22-95  10:12a
+NPREDICT IDE       115,652 06-10-95  11:26a
+PRDCTAPP RC         49,525 06-07-95  11:37a
+PRDCTAPP RH         23,867 06-06-95   2:33p
+       63 file(s)      1,152,450 bytes
+
+Total files listed:
+      240 file(s)      4,422,219 bytes
+                     349,396,992 bytes free
+

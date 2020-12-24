@@ -1,0 +1,362 @@
+;  This is a quite exhaustive test of neural network training.
+;  It covers nearly all network models, structures, and learning algorithms.
+;  Both CLASSIFICATION and MAPPING output modes are tested.
+
+;  Please note that the class1.dat and class2.dat files have been carefully
+;  designed to produce an excellent global minimum EXTREMELY well hidden
+;  among a multitude of poor local minima.  The learning algorithms in this
+;  test suite will be stressed to the limit, and beyond.  The hybrid methods
+;  will exhibit many time consuming escapes, far more than is natural for
+;  most problems.  Also, results of these tests are very much affected by
+;  the state of the random number generator, as relatively few stochastic
+;  iterations are done.  Do not be discouraged by all this.  The data used
+;  here is not representative of most real-life data.  This is a stress test.
+
+PROGRESS ON
+ALLOWABLE ERROR = 0.0
+
+;  Read the data
+
+NAME = A1, A2, A3, A4, A5, A6
+READ SIGNAL FILE = class1.dat
+NAME = B1, B2, B3, B4, B5, B6
+READ SIGNAL FILE = class2.dat
+
+;  First block of tests is in classification mode
+;  Cumulate the training set
+
+INPUT = A1
+INPUT = A2
+INPUT = A3
+INPUT = A4
+CLASS = class1
+CUMULATE TRAINING SET
+CLEAR INPUT LIST
+INPUT = B1
+INPUT = B2
+INPUT = B3
+INPUT = B4
+CLASS = class2
+CUMULATE TRAINING SET
+
+;  Test the probabilistic family of network models
+
+SIGMA LOW = 0.1
+SIGMA HIGH = 15.0
+SIGMA TRIES = 10
+
+NETWORK MODEL = PNN
+KERNEL = RECIPROCAL
+TRAIN NETWORK = temp
+CLEAR NETWORK = temp
+
+KERNEL = GAUSS
+TRAIN NETWORK = temp
+CLEAR NETWORK = temp
+
+NETWORK MODEL = SEPVAR
+TRAIN NETWORK = temp
+CLEAR NETWORK = temp
+
+NETWORK MODEL = SEPCLASS
+TRAIN NETWORK = temp
+CLEAR NETWORK = temp
+
+;  Now test MLFN models
+
+NETWORK MODEL = MLFN
+MLFN RESTARTS = 4
+MLFN PRETRIES = 2
+ACCURACY = 6
+REFINE = 2
+
+ANNEALING INITIALIZATION TEMPERATURES = 3
+ANNEALING INITIALIZATION ITERATIONS = 20
+ANNEALING INITIALIZATION SETBACK = 20
+ANNEALING INITIALIZATION START = 2.0
+ANNEALING INITIALIZATION STOP = 0.5
+ANNEALING INITIALIZATION RANDOM = GAUSS
+ANNEALING INITIALIZATION REDUCTION = EXPONENTIAL
+ANNEALING INITIALIZATION ACCEPT = CLIMB
+
+ANNEALING ESCAPE TEMPERATURES = 2
+ANNEALING ESCAPE ITERATIONS = 10
+ANNEALING ESCAPE SETBACK = 0
+ANNEALING ESCAPE START = 2.0
+ANNEALING ESCAPE STOP = 0.1
+ANNEALING ESCAPE RANDOM = CAUCHY
+ANNEALING ESCAPE REDUCTION = EXPONENTIAL
+ANNEALING ESCAPE ACCEPT = CLIMB
+
+MLFN HID 1 = 0
+MLFN HID 2 = 0
+MLFN OUTPUT ACTIVATION = NONLINEAR  ; If LINEAR, REGRESS_?? would be trivial
+
+MLFN LEARNING METHOD = REGRESS_CJ
+TRAIN NETWORK = temp
+CLEAR NETWORK = temp
+
+MLFN LEARNING METHOD = REGRESS_LM
+TRAIN NETWORK = temp
+CLEAR NETWORK = temp
+
+MLFN HID 1 = 2
+MLFN OUTPUT ACTIVATION = LINEAR
+
+MLFN LEARNING METHOD = AN1_CJ   ;  Begin testing learning algorithms
+TRAIN NETWORK = temp
+CLEAR NETWORK = temp
+
+MLFN LEARNING METHOD = AN1_LM
+TRAIN NETWORK = temp
+CLEAR NETWORK = temp
+
+MLFN HID 2 = 2                  ; Introduce a second hidden layer
+
+MLFN LEARNING METHOD = AN2_CJ   ; Continue testing learning algorithms
+TRAIN NETWORK = temp
+CLEAR NETWORK = temp
+
+MLFN LEARNING METHOD = AN2_LM
+TRAIN NETWORK = temp
+CLEAR NETWORK = temp
+
+MLFN LEARNING METHOD = AN1
+TRAIN NETWORK = temp
+CLEAR NETWORK = temp
+
+MLFN LEARNING METHOD = AN2
+TRAIN NETWORK = temp
+CLEAR NETWORK = temp
+
+MLFN LEARNING METHOD = SS
+TRAIN NETWORK = temp
+CLEAR NETWORK = temp
+
+MLFN LEARNING METHOD = SSG
+TRAIN NETWORK = temp
+CLEAR NETWORK = temp
+
+MLFN LEARNING METHOD = AN1_CJ  ; Use this one to test all error types
+
+MLFN ERROR TYPE = MEAN SQUARE  ; Always start with this for stability
+TRAIN NETWORK = temp
+MLFN ERROR TYPE = ABSOLUTE
+TRAIN NETWORK = temp
+CLEAR NETWORK = temp
+
+MLFN ERROR TYPE = MEAN SQUARE
+TRAIN NETWORK = temp
+MLFN ERROR TYPE = KK
+TRAIN NETWORK = temp
+CLEAR NETWORK = temp
+
+MLFN OUTPUT ACTIVATION = NONLINEAR  ;  CROSS ENTROPY dislikes LINEAR
+MLFN ERROR TYPE = MEAN SQUARE
+TRAIN NETWORK = temp
+MLFN ERROR TYPE = CROSS ENTROPY
+TRAIN NETWORK = temp
+CLEAR NETWORK = temp
+
+;  CLASSIFICATION mode has been tested.
+;  Now use MAPPING.
+
+CLEAR TRAINING SET
+CLEAR CLASSES
+CLEAR INPUT LIST
+CLEAR OUTPUT LIST
+
+INPUT = A1
+INPUT = A2
+INPUT = A3
+INPUT = A4
+OUTPUT = A5
+OUTPUT = A6
+CUMULATE TRAINING SET
+CLEAR INPUT LIST
+CLEAR OUTPUT LIST
+INPUT = B1
+INPUT = B2
+INPUT = B3
+INPUT = B4
+OUTPUT = B5
+OUTPUT = B6
+CUMULATE TRAINING SET
+
+;  Test the probabilistic family of network models
+
+KERNEL = GAUSS
+
+NETWORK MODEL = PNN
+TRAIN NETWORK = temp
+CLEAR NETWORK = temp
+
+NETWORK MODEL = SEPVAR
+TRAIN NETWORK = temp
+CLEAR NETWORK = temp
+
+;  Now test MLFN models
+
+NETWORK MODEL = MLFN
+MLFN ERROR TYPE = MEAN SQUARE
+
+MLFN HID 1 = 0
+MLFN HID 2 = 0
+MLFN OUTPUT ACTIVATION = NONLINEAR  ; If LINEAR, REGRESS_?? would be trivial
+
+MLFN LEARNING METHOD = REGRESS_CJ
+TRAIN NETWORK = temp
+CLEAR NETWORK = temp
+
+MLFN LEARNING METHOD = REGRESS_LM
+TRAIN NETWORK = temp
+CLEAR NETWORK = temp
+
+MLFN HID 1 = 2                   ;  Add a single hidden layer
+
+MLFN OUTPUT ACTIVATION = LINEAR
+MLFN LEARNING METHOD = AN1_CJ    ;  Begin testing learning algorithms
+TRAIN NETWORK = temp
+CLEAR NETWORK = temp
+
+MLFN LEARNING METHOD = AN1_LM
+TRAIN NETWORK = temp
+CLEAR NETWORK = temp
+
+MLFN HID 1 = 2                   ;  Add a second hidden layer
+MLFN HID 2 = 2
+
+MLFN LEARNING METHOD = AN2_CJ    ;  Continue testing learning algorithms
+TRAIN NETWORK = temp
+CLEAR NETWORK = temp
+
+MLFN LEARNING METHOD = AN2_LM
+TRAIN NETWORK = temp
+CLEAR NETWORK = temp
+
+MLFN LEARNING METHOD = AN1
+TRAIN NETWORK = temp
+CLEAR NETWORK = temp
+
+MLFN LEARNING METHOD = AN2
+TRAIN NETWORK = temp
+CLEAR NETWORK = temp
+
+MLFN LEARNING METHOD = SS
+TRAIN NETWORK = temp
+CLEAR NETWORK = temp
+
+MLFN LEARNING METHOD = SSG
+TRAIN NETWORK = temp
+CLEAR NETWORK = temp
+
+MLFN LEARNING METHOD = AN1_CJ  ; Use this one to test all error types
+
+MLFN ERROR TYPE = MEAN SQUARE  ; Always start with this for stability
+TRAIN NETWORK = temp
+MLFN ERROR TYPE = ABSOLUTE
+TRAIN NETWORK = temp
+CLEAR NETWORK = temp
+
+MLFN ERROR TYPE = MEAN SQUARE
+TRAIN NETWORK = temp
+MLFN ERROR TYPE = KK
+TRAIN NETWORK = temp
+CLEAR NETWORK = temp
+
+;  Now quickly finish up by going back to classification mode.
+;  But this time use just one output, as class / reject
+
+CLEAR INPUT LIST
+CLEAR OUTPUT LIST
+CLEAR TRAINING SET
+CLEAR CLASSES
+
+;  Cumulate the training set
+
+INPUT = A1
+INPUT = A2
+INPUT = A3
+INPUT = A4
+CLASS = reject
+CUMULATE TRAINING SET
+CLEAR INPUT LIST
+INPUT = B1
+INPUT = B2
+INPUT = B3
+INPUT = B4
+CLASS = class
+CUMULATE TRAINING SET
+
+MLFN HID 1 = 0
+MLFN HID 2 = 0
+MLFN OUTPUT ACTIVATION = NONLINEAR  ; If LINEAR, REGRESS_?? would be trivial
+MLFN ERROR TYPE = MEAN SQUARE
+
+MLFN LEARNING METHOD = REGRESS_CJ
+TRAIN NETWORK = temp
+CLEAR NETWORK = temp
+
+MLFN LEARNING METHOD = REGRESS_LM
+TRAIN NETWORK = temp
+CLEAR NETWORK = temp
+
+MLFN HID 1 = 2
+MLFN OUTPUT ACTIVATION = LINEAR
+
+MLFN LEARNING METHOD = AN1_CJ   ;  Begin testing learning algorithms
+TRAIN NETWORK = temp
+CLEAR NETWORK = temp
+
+MLFN LEARNING METHOD = AN1_LM
+TRAIN NETWORK = temp
+CLEAR NETWORK = temp
+
+MLFN HID 2 = 2                  ; Introduce a second hidden layer
+
+MLFN LEARNING METHOD = AN2_CJ   ; Continue testing learning algorithms
+TRAIN NETWORK = temp
+CLEAR NETWORK = temp
+
+MLFN LEARNING METHOD = AN2_LM
+TRAIN NETWORK = temp
+CLEAR NETWORK = temp
+
+MLFN LEARNING METHOD = AN1
+TRAIN NETWORK = temp
+CLEAR NETWORK = temp
+
+MLFN LEARNING METHOD = AN2
+TRAIN NETWORK = temp
+CLEAR NETWORK = temp
+
+MLFN LEARNING METHOD = SS
+TRAIN NETWORK = temp
+CLEAR NETWORK = temp
+
+MLFN LEARNING METHOD = SSG
+TRAIN NETWORK = temp
+CLEAR NETWORK = temp
+
+MLFN LEARNING METHOD = AN1_CJ  ; Use this one to test all error types
+
+MLFN ERROR TYPE = MEAN SQUARE  ; Always start with this for stability
+TRAIN NETWORK = temp
+MLFN ERROR TYPE = ABSOLUTE
+TRAIN NETWORK = temp
+CLEAR NETWORK = temp
+
+MLFN ERROR TYPE = MEAN SQUARE
+TRAIN NETWORK = temp
+MLFN ERROR TYPE = KK
+TRAIN NETWORK = temp
+CLEAR NETWORK = temp
+
+MLFN OUTPUT ACTIVATION = NONLINEAR  ;  CROSS ENTROPY dislikes LINEAR
+MLFN ERROR TYPE = MEAN SQUARE
+TRAIN NETWORK = temp
+MLFN ERROR TYPE = CROSS ENTROPY
+TRAIN NETWORK = temp
+CLEAR NETWORK = temp
+
+

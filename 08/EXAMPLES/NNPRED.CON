@@ -1,0 +1,20 @@
+PROGRESS ON
+NETWORK MODEL = PNN
+
+NAME = sinewave
+GENERATE = 32 SINE ( 1.0 , 16 , 0.0 )
+
+INPUT = sinewave 0-1     ; These are the current and lag that serve as input
+OUTPUT = sinewave 1      ; This is the lead value, the output
+CUMULATE TRAINING SET
+
+TRAIN NETWORK = demo
+NAME = predicted
+NETWORK PREDICT = 35 demo
+DISPLAY = sinewave
+DISPLAY = predicted
+
+NAME = sinewave
+NETWORK PREDICT = 201 demo
+DISPLAY = sinewave
+

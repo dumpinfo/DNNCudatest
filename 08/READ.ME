@@ -1,0 +1,32 @@
+This disk contains two copies of the NPREDICT program.  The copy in the
+\DOS subdirectory is a 32-bit extended DOS version.  It automatically
+uses the hard drive for virtual memory.  A VESA-compatible video display
+and a hardware floating-point coprocessor are both required.  The copy of
+NPREDICT in the \WINDOWS subdirectory is a Win32s implementation of the
+program.  It is intended for NT, but it should run in Windows 3.1 with the
+Win32s extensions installed.  It is likely that it will also run under
+Windows 95, but that has not been tested.
+
+The subdirectory \VALIDATE on this disk contains the validation 
+command files listed at the end of the last chapter of the book.  
+These may be useful to readers who recompile the program for their 
+own platform.  Please note that the conjugate gradient algorithm, when 
+applied to ill-conditioned problems like those contained in this 
+validation suite, is extremely sensitive to floating-point rounding 
+methods.  It is to be expected that different compilers may produce 
+different results.
+
+All of the code on this disk has been tested for ANSI compatibility.
+The author uses Symantec C++ for DOS development, and Borland C++ for Windows.
+
+Please remember that the programs and algorithms in this book/disk set
+have been included for instructional purposes only.  All large programming
+projects contain bugs.  Even though extensive testing has been done,
+neither the publisher nor the author make any representations or warranties
+concerning the correctness of these programs and algorithms, or their
+suitability for any particular task.  They should not be used in any
+application in which there is risk of injury or serious loss.
+The publisher and author shall not be liable for any loss incurred as a
+result of the use of these programs or algorithms.
+
+

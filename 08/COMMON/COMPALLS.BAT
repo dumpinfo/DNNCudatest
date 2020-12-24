@@ -1,0 +1,79 @@
+set ipath=c:\sc\include
+del temp
+del *.obj
+c:\sc\bin\sc activity  -a4 -A -3 -bx -c -ff -mx -r -s -v1 >>temp
+c:\sc\bin\sc act_func  -a4 -A -3 -bx -c -ff -mx -r -s -v1 >>temp
+c:\sc\bin\sc anneal1  -a4 -A -3 -bx -c -ff -mx -r -s -v1 >>temp
+c:\sc\bin\sc anneal2  -a4 -A -3 -bx -c -ff -mx -r -s -v1 >>temp
+c:\sc\bin\sc anx  -a4 -A -3 -bx -c -ff -mx -r -s -v1 >>temp
+c:\sc\bin\sc anx_dd  -a4 -A -3 -bx -c -ff -mx -r -s -v1 >>temp
+c:\sc\bin\sc arma  -a4 -A -3 -bx -c -ff -mx -r -s -v1 >>temp
+c:\sc\bin\sc armaconf  -a4 -A -3 -bx -c -ff -mx -r -s -v1 >>temp
+c:\sc\bin\sc armapred  -a4 -A -3 -bx -c -ff -mx -r -s -v1 >>temp
+c:\sc\bin\sc armasave  -a4 -A -3 -bx -c -ff -mx -r -s -v1 >>temp
+c:\sc\bin\sc autocorr  -a4 -A -3 -bx -c -ff -mx -r -s -v1 >>temp
+c:\sc\bin\sc brentmin  -a4 -A -3 -bx -c -ff -mx -r -s -v1 >>temp
+c:\sc\bin\sc burg  -a4 -A -3 -bx -c -ff -mx -r -s -v1 >>temp
+c:\sc\bin\sc combine  -a4 -A -3 -bx -c -ff -mx -r -s -v1 >>temp
+c:\sc\bin\sc conjgrad  -a4 -A -3 -bx -c -ff -mx -r -s -v1 >>temp
+c:\sc\bin\sc control  -a4 -A -3 -bx -c -ff -mx -r -s -v1 >>temp
+c:\sc\bin\sc copy  -a4 -A -3 -bx -c -ff -mx -r -s -v1 >>temp
+c:\sc\bin\sc cvtrain  -a4 -A -3 -bx -c -ff -mx -r -s -v1 >>temp
+c:\sc\bin\sc defaults  -a4 -A -3 -bx -c -ff -mx -r -s -v1 >>temp
+c:\sc\bin\sc dermin  -a4 -A -3 -bx -c -ff -mx -r -s -v1 >>temp
+c:\sc\bin\sc dotprod  -a4 -A -3 -bx -c -ff -mx -r -s -v1 >>temp
+c:\sc\bin\sc dotprodc  -a4 -A -3 -bx -c -ff -mx -r -s -v1 >>temp
+c:\sc\bin\sc eigen  -a4 -A -3 -bx -c -ff -mx -r -s -v1 >>temp
+c:\sc\bin\sc filter  -a4 -A -3 -bx -c -ff -mx -r -s -v1 >>temp
+c:\sc\bin\sc filt_sig  -a4 -A -3 -bx -c -ff -mx -r -s -v1 >>temp
+c:\sc\bin\sc flrand  -a4 -A -3 -bx -c -ff -mx -r -s -v1 >>temp
+c:\sc\bin\sc generate  -a4 -A -3 -bx -c -ff -mx -r -s -v1 >>temp
+c:\sc\bin\sc glob_min  -a4 -A -3 -bx -c -ff -mx -r -s -v1 >>temp
+c:\sc\bin\sc gradient  -a4 -A -3 -bx -c -ff -mx -r -s -v1 >>temp
+c:\sc\bin\sc graphlab  -a4 -A -3 -bx -c -ff -mx -r -s -v1 >>temp
+c:\sc\bin\sc in_out  -a4 -A -3 -bx -c -ff -mx -r -s -v1 >>temp
+c:\sc\bin\sc limit  -a4 -A -3 -bx -c -ff -mx -r -s -v1 >>temp
+c:\sc\bin\sc lev_marq  -a4 -A -3 -bx -c -ff -mx -r -s -v1 >>temp
+c:\sc\bin\sc lm_core  -a4 -A -3 -bx -c -ff -mx -r -s -v1 >>temp
+c:\sc\bin\sc maxent  -a4 -A -3 -bx -c -ff -mx -r -s -v1 >>temp
+c:\sc\bin\sc mem  -a4 -A -3 -bx -c -ff -mx -r -s -v1 >>temp
+c:\sc\bin\sc mlfn  -a4 -A -3 -bx -c -ff -mx -r -s -v1 >>temp
+c:\sc\bin\sc morlet  -a4 -A -3 -bx -c -ff -mx -r -s -v1 >>temp
+c:\sc\bin\sc mov_avg  -a4 -A -3 -bx -c -ff -mx -r -s -v1 >>temp
+c:\sc\bin\sc mrfft  -a4 -A -3 -bx -c -ff -mx -r -s -v1 >>temp
+c:\sc\bin\sc mrfft_k.c  -a4 -3 -bx -c -ff -mx -r -s -v1 >>temp
+c:\sc\bin\sc mrfft_p  -a4 -A -3 -bx -c -ff -mx -r -s -v1 >>temp
+c:\sc\bin\sc net_conf  -a4 -A -3 -bx -c -ff -mx -r -s -v1 >>temp
+c:\sc\bin\sc net_pred  -a4 -A -3 -bx -c -ff -mx -r -s -v1 >>temp
+c:\sc\bin\sc network  -a4 -A -3 -bx -c -ff -mx -r -s -v1 >>temp
+c:\sc\bin\sc np_conf  -a4 -A -3 -bx -c -ff -mx -r -s -v1 >>temp
+c:\sc\bin\sc orthog  -a4 -A -3 -bx -c -ff -mx -r -s -v1 >>temp
+c:\sc\bin\sc orthsave  -a4 -A -3 -bx -c -ff -mx -r -s -v1 >>temp
+c:\sc\bin\sc parsdubl  -a4 -A -3 -bx -c -ff -mx -r -s -v1 >>temp
+c:\sc\bin\sc pnnet  -a4 -A -3 -bx -c -ff -mx -r -s -v1 >>temp
+c:\sc\bin\sc pnnbasic  -a4 -A -3 -bx -c -ff -mx -r -s -v1 >>temp
+c:\sc\bin\sc powell  -a4 -A -3 -bx -c -ff -mx -r -s -v1 >>temp
+c:\sc\bin\sc process  -a4 -A -3 -bx -c -ff -mx -r -s -v1 =2000000 >>temp
+c:\sc\bin\sc qmf_sig  -a4 -A -3 -bx -c -ff -mx -r -s -v1 >>temp
+c:\sc\bin\sc qsort  -a4 -A -3 -bx -c -ff -mx -r -s -v1 >>temp
+c:\sc\bin\sc random  -a4 -A -3 -bx -c -ff -mx -r -s -v1 >>temp
+c:\sc\bin\sc readsig  -a4 -A -3 -bx -c -ff -mx -r -s -v1 >>temp
+c:\sc\bin\sc regress  -a4 -A -3 -bx -c -ff -mx -r -s -v1 >>temp
+c:\sc\bin\sc regrs_dd  -a4 -A -3 -bx -c -ff -mx -r -s -v1 >>temp
+c:\sc\bin\sc savgol  -a4 -A -3 -bx -c -ff -mx -r -s -v1 >>temp
+c:\sc\bin\sc sepclass  -a4 -A -3 -bx -c -ff -mx -r -s -v1 >>temp
+c:\sc\bin\sc sepvar  -a4 -A -3 -bx -c -ff -mx -r -s -v1 >>temp
+c:\sc\bin\sc shake  -a4 -A -3 -bx -c -ff -mx -r -s -v1 >>temp
+c:\sc\bin\sc signal  -a4 -A -3 -bx -c -ff -mx -r -s -v1 >>temp
+c:\sc\bin\sc sig_save  -a4 -A -3 -bx -c -ff -mx -r -s -v1 >>temp
+c:\sc\bin\sc spectrum  -a4 -A -3 -bx -c -ff -mx -r -s -v1 >>temp
+c:\sc\bin\sc ssg  -a4 -A -3 -bx -c -ff -mx -r -s -v1 >>temp
+c:\sc\bin\sc ssg_core  -a4 -A -3 -bx -c -ff -mx -r -s -v1 >>temp
+c:\sc\bin\sc strings  -a4 -A -3 -bx -c -ff -mx -r -s -v1 >>temp
+c:\sc\bin\sc svdcmp  -a4 -A -3 -bx -c -ff -mx -r -s -v1 >>temp
+c:\sc\bin\sc testnet  -a4 -A -3 -bx -c -ff -mx -r -s -v1 >>temp
+c:\sc\bin\sc train  -a4 -A -3 -bx -c -ff -mx -r -s -v1 >>temp
+c:\sc\bin\sc wt_save  -a4 -A -3 -bx -c -ff -mx -r -s -v1 >>temp
+c:\sc\bin\sc veclen  -a4 -A -3 -bx -c -ff -mx -r -s -v1 >>temp
+
+

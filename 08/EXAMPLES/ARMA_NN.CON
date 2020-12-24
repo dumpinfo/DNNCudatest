@@ -1,0 +1,72 @@
+; Demonstrate hybrid ARMA/neural prediction via ARMA SHOCK command
+
+PROGRESS OFF
+DISPLAY RANGE = -4 4
+ALLOWABLE ERROR = 0.0
+NETWORK MODEL = PNN
+SIGMA LOW = 0.1
+SIGMA HIGH = 10.0
+SIGMA TRIES = 7
+
+NAME = deterministic    ; This is a non-ARMA component the net will find
+GENERATE = 180 SINE 2.0 40.0 90
+DISPLAY = deterministic
+
+NAME = random           ; This is the random component the ARMA will find
+GENERATE = 180 ARMA  0 0 .2 0 0 .5
+DISPLAY = random
+
+NAME = signal           ; The final signal is the sum of both components
+ADD = deterministic AND random
+
+; Train the ARMA model and compute the shocks within the known output series
+
+INPUT = signal 10
+OUTPUT = signal 10
+TRAIN ARMA = temp
+
+NAME = within_pred          ; Point-by-point prediction within known output
+ARMA PREDICT = 180 temp
+NAME = shock , within_shock ; Shocks are the diff between actual and predicted
+SUBTRACT = signal AND within_pred
+DISPLAY = signal
+DISPLAY = within_pred
+DISPLAY = within_shock
+
+; Train a neural network to predict the shocks
+; Exclude the first few cases, which are before MA stabilization
+
+CLEAR INPUT LIST
+CLEAR OUTPUT LIST
+INPUT = shock 19-21
+INPUT = shock 39-41
+OUTPUT = shock
+CUMULATE EXCLUDE = 25
+CUMULATE TRAINING SET
+TRAIN NETWORK = temp           ; It's OK to use the same name for nets and ARMAs
+NAME = shock                   ; By using the same name as the input signal
+NETWORK PREDICT = 200 temp     ; We cause the true values to overwrite start
+DISPLAY = shock                ; The predictions are at the end only
+
+; Do two ARMA predictions.
+; The first is the traditional method, using zero shocks beyond the end.
+; The second uses the predicted shocks.  Note the improvement.
+
+CLEAR INPUT LIST
+CLEAR OUTPUT LIST
+INPUT = signal 10
+OUTPUT = signal 10
+NAME = predict_a               ; Traditional prediction with zero shocks
+ARMA PREDICT = 200 temp
+DISPLAY = predict_a
+ARMA SHOCK = shock FOR signal  ; Now tell the model to use the predicted shocks
+NAME = predict_b
+ARMA PREDICT = 200 temp
+DISPLAY = predict_b
+
+CLEAR INPUT LIST
+CLEAR OUTPUT LIST
+CLEAR ARMAS
+CLEAR NETWORKS
+CLEAR TRAINING SET
+

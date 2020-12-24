@@ -1,0 +1,195 @@
+;  Test neural network prediction
+
+PROGRESS ON
+MLFN LEARNING METHOD = AN1_LM
+MLFN RESTARTS = 5
+MLFN PRETRIES = 6
+MLFN HID 1 = 2
+MLFN HID 2 = 0
+
+;  Start with a trivial problem.
+;  Predict the current value of a series based on two lagged values.
+;  Note that the first two points and the last point in the predicted series
+;  are based on one or more inputs beyond the input series, so these points
+;  may be expected to be poor.
+;  The second-last point is the one-ahead prediction that we are most
+;  interested in.
+
+NAME = sinewave
+GENERATE = 30 SINE ( 1.0 , 15 , 0.0 )
+
+INPUT = sinewave 1-2     ; These are the two lags that serve as input
+OUTPUT = sinewave        ; This is the current value, the output
+CUMULATE TRAINING SET
+
+NETWORK MODEL = PNN
+TRAIN NETWORK = pnn_lag_1_2_lead_0
+NAME = pred1
+NETWORK PREDICT = 32 pnn_lag_1_2_lead_0
+DISPLAY = pred1
+
+NETWORK MODEL = MLFN
+TRAIN NETWORK = mlfn_lag_1_2_lead_0
+NAME = pred2
+NETWORK PREDICT = 32 mlfn_lag_1_2_lead_0
+DISPLAY = pred2
+
+;  Now do essentially the same thing, but in a different way.
+;  Use the current and previous values to predict one ahead.
+;  This time, the first output point will not be computed.
+;  The second and the last will be bad, as before.
+;  Again, the second-last point is the one-ahead prediction that
+;  we are most interested in.
+
+CLEAR INPUT LIST
+CLEAR OUTPUT LIST
+CLEAR TRAINING SET
+
+INPUT = sinewave 0-1     ; These are the current and lagged values for input
+OUTPUT = sinewave 1      ; This is the lead-one value, the output
+CUMULATE TRAINING SET
+
+NETWORK MODEL = PNN
+TRAIN NETWORK = pnn_lag_0_1_lead_1
+NAME = pred3
+NETWORK PREDICT = 32 pnn_lag_0_1_lead_1
+DISPLAY = pred3
+
+NETWORK MODEL = MLFN
+TRAIN NETWORK = mlfn_lag_0_1_lead_1
+NAME = pred4
+NETWORK PREDICT = 32 mlfn_lag_0_1_lead_1
+DISPLAY = pred4
+
+;  The previous two examples use separate input and output signals.
+;  That is one possible procedure, as it lets us compare the point-by-point
+;  predictions with the original (known) data.
+;  But since valid data points run out at the end of the series, we cannot
+;  do recursive prediction based on previously predicted values.
+;  Use the same input as output to do recursive prediction now.
+;  Note the incredible power of recursive prediction when it is based on
+;  a network that can accurately model the training data.  This little test
+;  is extrapolating from only two points!
+
+NAME = testwave1 , testwave2 , testwave3 , testwave4
+GENERATE = 2 SINE ( 1.0 , 15 , 0.0 )
+CLEAR INPUT LIST
+INPUT = testwave1 1-2
+NAME = testwave1
+NETWORK PREDICT = 151 pnn_lag_1_2_lead_0
+DISPLAY = testwave1
+
+CLEAR INPUT LIST
+INPUT = testwave2 1-2
+NAME = testwave2
+NETWORK PREDICT = 151 mlfn_lag_1_2_lead_0
+DISPLAY = testwave2
+
+CLEAR INPUT LIST
+INPUT = testwave3 0-1
+NAME = testwave3
+NETWORK PREDICT = 151 pnn_lag_0_1_lead_1
+DISPLAY = testwave3
+
+CLEAR INPUT LIST
+INPUT = testwave4 0-1
+NAME = testwave4
+NETWORK PREDICT = 151 mlfn_lag_0_1_lead_1
+DISPLAY = testwave4
+
+
+;  The easy stuff is done.  Now get complicated.
+;  Use two signals at several lags to predict these two signals and a third
+;  at several leads.
+
+NAME = sinewave
+GENERATE = 30 SINE ( 1.0 , 15 , 0.0 )
+NAME = coswave
+GENERATE = 30 SINE ( 1.0 , 15 , 90.0 )
+NAME = invertwave
+GENERATE = 30 SINE ( 1.0 , 15 , 180.0 )
+
+CLEAR NETWORKS
+CLEAR INPUT LIST
+CLEAR OUTPUT LIST
+CLEAR TRAINING SET
+
+INPUT = sinewave 1
+INPUT = sinewave 4
+INPUT = coswave 3
+OUTPUT = sinewave
+OUTPUT = coswave 2
+OUTPUT = invertwave 1
+CUMULATE TRAINING SET
+
+NETWORK MODEL = SEPVAR
+TRAIN NETWORK = pnn_complicated
+
+NAME = pred_sine , pred_cosine , pred_invert
+NETWORK PREDICT = 41 pnn_complicated
+DISPLAY = pred_sine
+DISPLAY = pred_cosine
+DISPLAY = pred_invert
+
+;  Now do recursive prediction with this model
+
+NAME = extend_sine
+GENERATE = 6 SINE ( 1.0 , 15 , 0.0 )
+NAME = extend_cosine
+GENERATE = 6 SINE ( 1.0 , 15 , 90.0 )
+
+CLEAR INPUT LIST
+INPUT = extend_sine 1
+INPUT = extend_sine 4
+INPUT = extend_cosine 3
+NAME = extend_sine , extend_cosine , extend_invert
+NETWORK PREDICT = 151 pnn_complicated
+
+DISPLAY = extend_sine
+DISPLAY = extend_cosine
+DISPLAY = extend_invert
+
+;  Finally, let's try classification.  Output neuron activations (which are
+;  Bayesian probabilities in PNN models) can be used to define signals.
+;  Note that this training set has been chosen to have regularly spaced
+;  areas of confusion.
+
+CLEAR INPUT LIST
+CLEAR OUTPUT LIST
+CLEAR TRAINING SET
+CLEAR NETWORKS
+
+NAME = sinewave
+GENERATE = 30 SINE ( 1.0 , 15 , 0.0 )
+NAME = in_phase
+GENERATE = 30 SINE ( 1.0 , 15 , 0.0 )
+NAME = inverted
+GENERATE = 30 SINE ( 1.0 , 15 , 180.0 )
+
+INPUT = sinewave
+INPUT = in_phase
+CLASS = same
+CUMULATE TRAINING SET
+
+CLEAR INPUT LIST
+INPUT = sinewave
+INPUT = inverted
+CLASS = opposite
+CUMULATE TRAINING SET
+
+NETWORK MODEL = MLFN
+TRAIN NETWORK = mlfn_class
+
+NAME = wave1
+GENERATE = 151 SINE ( 1.0 , 12 , 0.0 )
+NAME = wave2
+GENERATE = 151 SINE ( 1.0 , 18 , 0.0 )
+
+CLEAR INPUT LIST
+INPUT = wave1
+INPUT = wave2
+NAME = pred_same , pred_opposite
+NETWORK PREDICT = 151 mlfn_class
+DISPLAY = pred_same
+DISPLAY = pred_opposite
+

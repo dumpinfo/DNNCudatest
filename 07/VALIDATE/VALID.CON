@@ -1,0 +1,16 @@
+ALLOWABLE ERROR = 0.0   ; Ask for the best
+MAXIMUM RESTARTS = 3    ; But only give it four tries (first + 3)
+CJ PRETRIES = 4         ; Most efficient if one less than restarts
+CJ ACCURACY = 5
+CJ REFINE = 2
+
+COMMAND FILE = VALID1A.CON
+COMMAND FILE = VALID2A.CON
+COMMAND FILE = VALID3A.CON
+
+COMMAND FILE = VALID1B.CON
+COMMAND FILE = VALID2B.CON
+COMMAND FILE = VALID3B.CON
+
+BYE
+

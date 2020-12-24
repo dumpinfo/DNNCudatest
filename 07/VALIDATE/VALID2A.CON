@@ -1,0 +1,56 @@
+;  Make the network learn an XOR problem using general function mapping.
+;  Since we are using the minimum number of hidden neurons, this is a
+;  very difficult task to learn.  It may well fail in the tries allowed.
+
+DOMAIN = REAL
+ERROR TYPE = MEAN SQUARE
+MODE = MAPPING
+OUTPUT ACTIVATION = LINEAR
+
+INPUTS = 4
+OUTPUTS = 2
+FIRST HIDDEN = 4
+SECOND HIDDEN = 0
+
+CUMULATE TRAINING SET = zero4
+CUMULATE TRAINING SET = one4
+
+LEARNING ALGORITHM = ANNEALING_CJ
+COMPUTE WEIGHTS 
+ERASE TRAINING SET
+
+PRINT WEIGHTS = 2a1.prn
+SAVE NETWORK = 2a1.wts
+RUN OUTPUT = 2a1.prn
+RUN NETWORK WITH INPUT = zero4
+RUN NETWORK WITH INPUT = one4
+ERASE NETWORK 
+
+;  Now solve the same problem, but in the complex domain.
+;  It can be solved with two complex hidden neurons, but the
+;  solution is very difficult to find.  Using three makes it easy.
+
+DOMAIN = COMPLEX
+ERROR TYPE = MEAN SQUARE
+MODE = MAPPING
+OUTPUT ACTIVATION = LINEAR
+
+INPUTS = 2
+OUTPUTS = 1
+FIRST HIDDEN = 3
+SECOND HIDDEN = 0
+
+CUMULATE TRAINING SET = zero4
+CUMULATE TRAINING SET = one4
+
+LEARNING ALGORITHM = ANNEALING_CJ
+COMPUTE WEIGHTS 
+ERASE TRAINING SET
+
+PRINT WEIGHTS = 2a2.prn
+SAVE NETWORK = 2a2.wts
+RUN OUTPUT = 2a2.prn
+RUN NETWORK WITH INPUT = zero4
+RUN NETWORK WITH INPUT = one4
+ERASE NETWORK 
+

@@ -1,0 +1,150 @@
+;  Test all filters
+
+NAME = noise
+GENERATE = 500 NORMAL 10 2.0
+DISPLAY = noise
+
+NAME = ma
+MOVING AVERAGE = 10 noise
+DISPLAY = ma
+NAME = , , specma
+SPECTRUM = ma
+DISPLAY = specma
+
+NAME = low
+LOWPASS = .1 .01 noise
+DISPLAY = low
+NAME = , , speclow
+SPECTRUM = low
+DISPLAY = speclow
+
+NAME = mid
+BANDPASS = .25 .05 noise
+DISPLAY = mid
+NAME = , , specmid
+SPECTRUM = mid
+DISPLAY = specmid
+
+NAME = high
+HIGHPASS = .4 .01 noise
+DISPLAY = high
+NAME = , , spechigh
+SPECTRUM = high
+DISPLAY = spechigh
+
+;  QMF (including Morlet) filters
+
+NAME = wave
+GENERATE = 60 SINE 1 10.0 0.0
+COPY = 80 wave
+COPY = -100 wave
+DISPLAY = wave
+
+NAME = qreal , qimag , qamp , qphase
+QMF = .1 .05 wave
+DISPLAY = qreal
+DISPLAY = qimag
+DISPLAY = qamp
+DISPLAY = qphase
+
+NAME = mreal , mimag , mamp , mphase
+MORLET = .1 .05 wave
+DISPLAY = mreal
+DISPLAY = mimag
+DISPLAY = mamp
+DISPLAY = mphase
+
+; Detailed test comparing fitlers
+
+NAME = noise
+GENERATE = 500 NORMAL 10 2.0
+DISPLAY = noise
+
+NAME = bp1
+BANDPASS = .1 .05 noise
+DISPLAY = bp1
+NAME = , , spec_bp1
+SPECTRUM = bp1
+DISPLAY = spec_bp1
+
+NAME = q1
+QMF = .1 .05 noise
+DISPLAY = q1
+NAME = , , spec_q1
+SPECTRUM = q1
+DISPLAY = spec_q1
+
+NAME = m1
+MORLET = .1 .05 noise
+DISPLAY = m1
+NAME = , , spec_m1
+SPECTRUM = m1
+DISPLAY = spec_m1
+
+NAME = err1a
+SUBTRACT = q1 AND bp1
+DISPLAY = err1a
+
+NAME = err1b
+SUBTRACT = m1 AND bp1
+DISPLAY = err1b  ;  Error here caused by zeroing DC in Morlet but not bandpass
+
+NAME = bp2
+BANDPASS = .25 .05 noise
+DISPLAY = bp2
+NAME = , , spec_bp2
+SPECTRUM = bp2
+DISPLAY = spec_bp2
+
+NAME = q2
+QMF = .25 .05 noise
+DISPLAY = q2
+NAME = , , spec_q2
+SPECTRUM = q2
+DISPLAY = spec_q2
+
+NAME = m2
+MORLET = .25 .05 noise
+DISPLAY = m2
+NAME = , , spec_m2
+SPECTRUM = m2
+DISPLAY = spec_m2
+
+NAME = err2a
+SUBTRACT = q2 AND bp2
+DISPLAY = err2a
+
+NAME = err2b
+SUBTRACT = m2 AND bp2
+DISPLAY = err2b
+
+NAME = bp3
+BANDPASS = .4 .05 noise
+DISPLAY = bp3
+NAME = , , spec_bp3
+SPECTRUM = bp3
+DISPLAY = spec_bp3
+
+NAME = q3
+QMF = .4 .05 noise
+DISPLAY = q3
+NAME = , , spec_q3
+SPECTRUM = q3
+DISPLAY = spec_q3
+
+NAME = m3
+MORLET = .4 .05 noise
+DISPLAY = m3
+NAME = , , spec_m3
+SPECTRUM = m3
+DISPLAY = spec_m3
+
+NAME = err3a
+SUBTRACT = q3 AND bp3
+DISPLAY = err3a
+
+NAME = err3b
+SUBTRACT = m3 AND bp3
+DISPLAY = err3b  ; Modest error here is to be expected (Nyquist distortion)
+
+

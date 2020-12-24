@@ -1,0 +1,67 @@
+;  Test orthogonalization
+
+NAME = x1
+GENERATE = 100 NORMAL 0.0 1.0
+NAME = y1
+GENERATE = 100 NORMAL 0.0 1.0
+NAME = x2
+GENERATE = 100 NORMAL -10.0 1.0
+NAME = y2
+GENERATE = 100 NORMAL 10.0 1.0
+
+INPUT = x1               ; First variable
+INPUT = y1 0-2           ; Second, third, and fourth
+INPUT = y1 7             ; Fifth
+CLASS = dummy            ; Any name will do
+CUMULATE TRAINING SET    ; This builds the training set
+
+ORTHOGONALIZATION TYPE = PRINCIPAL COMPONENTS  ; This model ignores class
+ORTHOGONALIZATION STANDARDIZE = YES            ; Usually appropriate
+DEFINE ORTHOGONALIZATION = princo              ; Compute model
+
+;  Keep the same INPUT list as was used to define the model
+NAME = factor1 , factor2 , factor3 , factor4 , factor5
+APPLY ORTHOGONALIZATION = princo
+DISPLAY = factor1
+DISPLAY = factor2
+DISPLAY = factor3
+DISPLAY = factor4
+DISPLAY = factor5
+
+CLEAR CLASSES            ; We no longer need 'dummy' class
+CLEAR TRAINING SET       ; Start a fresh training set
+
+CLEAR INPUT LIST         ; Start a new input list
+INPUT = x1               ; First variable
+INPUT = y1 0-2           ; Second, third, and fourth
+INPUT = y1 7             ; Fifth
+CLASS = class1           ; These signals represent first class
+CUMULATE TRAINING SET    ; Start building the training set
+
+CLEAR INPUT LIST         ; Start a new input list
+INPUT = x2               ; First variable
+INPUT = y2 0-2           ; Second, third, and fourth
+INPUT = y2 7             ; Fifth
+CLASS = class2           ; These signals represent second class
+CUMULATE TRAINING SET    ; Append to the training set
+
+ORTHOGONALIZATION TYPE = DISCRIMINANT
+DEFINE ORTHOGONALIZATION = discrim
+
+
+CLEAR INPUT LIST         ; Start a new input list
+INPUT = x1               ; First variable
+INPUT = y1 0-2           ; Second, third, and fourth
+INPUT = y1 7             ; Fifth
+NAME = dfact1
+APPLY ORTHOGONALIZATION = discrim
+DISPLAY = dfact1
+
+CLEAR INPUT LIST         ; Start a new input list
+INPUT = x2               ; First variable
+INPUT = y2 0-2           ; Second, third, and fourth
+INPUT = y2 7             ; Fifth
+NAME = dfact2
+APPLY ORTHOGONALIZATION = discrim
+DISPLAY = dfact2
+

@@ -1,0 +1,16 @@
+activity act_func anneal1 anneal2 anx anx_dd
+arma armaconf armapred armasave
+autocorr brentmin burg combine conjgrad control copy
+cvtrain defaults dermin
+dotprod dotprodc eigen filter filt_sig
+flrand generate glob_min gradient graphlab
+in_out limit lev_marq lm_core maxent mem mlfn morlet mov_avg
+mrfft mrfft_k.c mrfft_p
+net_conf net_pred network np_conf
+orthog orthsave parsdubl pnnbasic pnnet powell process qmf_sig qsort
+random readsig regress regrs_dd
+savgol sepclass sepvar shake signal sig_save
+spectrum ssg ssg_core strings svdcmp
+testnet train wt_save veclen
+
+

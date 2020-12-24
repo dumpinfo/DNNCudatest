@@ -1,0 +1,229 @@
+;  Test ARMA models
+;  This can be very slow!
+
+PROGRESS ON
+ALLOWABLE ERROR = 0.0
+
+; The six parameters on the GENERATE ARMA commands are the following weights:
+;   AR(1)
+;   AR(2)
+;   AR(10)
+;   MA(1)
+;   MA(2)
+;   MA(10)
+
+NAME = a , aa
+GENERATE = 200 ARMA  -.8 0 0  0 0 0
+NAME = b , bb
+GENERATE = 200 ARMA  0 0 -.8  0 0 0
+NAME = c , cc
+GENERATE = 200 ARMA  0 0 0  -.8 0 0
+NAME = d , dd
+GENERATE = 200 ARMA  0 0 0  0 0 -.8
+
+; Test each individual series
+
+INPUT = a 1
+OUTPUT = a
+TRAIN ARMA = temp
+TRAIN ARMA = temp  ; Repeat to test retraining
+NAME = pred_anf
+ARMA PREDICT = 200 temp  ; This repetition has no practical significance.
+ARMA PREDICT = 300 temp  ; It is to check for program bugs only.
+DISPLAY = pred_anf
+CLEAR ARMA = temp
+ARMA FIXED = YES
+TRAIN ARMA = temp
+TRAIN ARMA = temp  ; Repeat to test retraining
+NAME = pred_af
+ARMA PREDICT = 200 temp
+ARMA PREDICT = 300 temp
+DISPLAY = pred_af
+CLEAR ARMA = temp
+CLEAR INPUT LIST
+CLEAR OUTPUT LIST
+ARMA FIXED = NO
+
+INPUT = b 10
+OUTPUT = b
+TRAIN ARMA = temp
+TRAIN ARMA = temp  ; Repeat to test retraining
+NAME = pred_bnf
+ARMA PREDICT = 200 temp
+ARMA PREDICT = 300 temp
+DISPLAY = pred_bnf
+CLEAR ARMA = temp
+ARMA FIXED = YES
+TRAIN ARMA = temp
+TRAIN ARMA = temp  ; Repeat to test retraining
+NAME = pred_bf
+ARMA PREDICT = 200 temp
+ARMA PREDICT = 300 temp
+DISPLAY = pred_bf
+CLEAR ARMA = temp
+CLEAR INPUT LIST
+CLEAR OUTPUT LIST
+ARMA FIXED = NO
+
+OUTPUT = c 1
+TRAIN ARMA = temp
+TRAIN ARMA = temp  ; Repeat to test retraining
+NAME = pred_cnf
+ARMA PREDICT = 200 temp
+ARMA PREDICT = 300 temp
+DISPLAY = pred_cnf
+CLEAR ARMA = temp
+ARMA FIXED = YES
+TRAIN ARMA = temp
+TRAIN ARMA = temp  ; Repeat to test retraining
+NAME = pred_cf
+ARMA PREDICT = 200 temp
+ARMA PREDICT = 300 temp
+DISPLAY = pred_cf
+CLEAR ARMA = temp
+CLEAR INPUT LIST
+CLEAR OUTPUT LIST
+ARMA FIXED = NO
+
+OUTPUT = d 10
+TRAIN ARMA = temp
+TRAIN ARMA = temp  ; Repeat to test retraining
+NAME = pred_dnf
+ARMA PREDICT = 200 temp
+ARMA PREDICT = 300 temp
+DISPLAY = pred_dnf
+CLEAR ARMA = temp
+ARMA FIXED = YES
+TRAIN ARMA = temp
+TRAIN ARMA = temp  ; Repeat to test retraining
+NAME = pred_df
+ARMA PREDICT = 200 temp
+ARMA PREDICT = 300 temp
+DISPLAY = pred_df
+CLEAR ARMA = temp
+CLEAR INPUT LIST
+CLEAR OUTPUT LIST
+ARMA FIXED = NO
+
+; Now do a massive multivariate test
+
+NAME = x
+GENERATE = 200 NORMAL ( 100.0 , 1.0 )
+
+INPUT = a 1
+INPUT = b 10
+INPUT = x 6-7
+OUTPUT = a
+OUTPUT = b
+OUTPUT = c 1
+OUTPUT = d 10
+OUTPUT = aa
+OUTPUT = bb
+OUTPUT = cc
+OUTPUT = dd
+OUTPUT = x 16-17
+
+TRAIN ARMA = temp
+TRAIN ARMA = temp  ; Repeat to test retraining
+NAME = pa, pb, pc, pd, paa, pbb, pcc, pdd, px
+ARMA PREDICT = 200 temp
+ARMA PREDICT = 300 temp
+DISPLAY = pa
+DISPLAY = paa
+DISPLAY = pb
+DISPLAY = pbb
+DISPLAY = pc
+DISPLAY = pcc
+DISPLAY = pd
+DISPLAY = pdd
+DISPLAY = px
+CLEAR ARMA = temp
+CLEAR INPUT LIST
+CLEAR OUTPUT LIST
+
+;  Finally, repeat the exact same test twice, but with inputs/outputs shuffled
+;  Also, save this first version, then restore and test at the end.
+
+INPUT = x 7
+OUTPUT = x 16
+INPUT = x 6
+OUTPUT = d 10
+OUTPUT = c 1
+INPUT = b 10
+OUTPUT = cc
+OUTPUT = aa
+OUTPUT = b
+OUTPUT = x 17
+INPUT = a 1
+OUTPUT = bb
+OUTPUT = dd
+OUTPUT = a
+OUTPUT = x
+
+TRAIN ARMA = temp
+TRAIN ARMA = temp  ; Repeat to test retraining
+SAVE ARMA = temp TO temp.wts
+NAME = pred_x1           ; x is the first output in the output list
+ARMA PREDICT = 200 temp
+ARMA PREDICT = 300 temp
+DISPLAY = pred_x1
+CLEAR ARMA = temp
+CLEAR INPUT LIST
+CLEAR OUTPUT LIST
+
+
+OUTPUT = dd
+OUTPUT = b
+OUTPUT = x
+INPUT = b 10
+OUTPUT = x 17
+INPUT = x 6
+INPUT = a 1
+OUTPUT = x 16
+OUTPUT = c 1
+OUTPUT = a
+OUTPUT = cc
+OUTPUT = aa
+OUTPUT = d 10
+OUTPUT = bb
+OUTPUT = c
+INPUT = x 7
+
+TRAIN ARMA = temp
+TRAIN ARMA = temp  ; Repeat to test retraining
+NAME = , , pred_x2    ; x is now the third in the output list
+ARMA PREDICT = 200 temp
+ARMA PREDICT = 300 temp
+DISPLAY = pred_x2
+CLEAR ARMA = temp
+CLEAR INPUT LIST
+CLEAR OUTPUT LIST
+
+;  Restore saved ARMA and test it
+
+INPUT = x 7
+OUTPUT = x 16
+INPUT = x 6
+OUTPUT = d 10
+OUTPUT = c 1
+INPUT = b 10
+OUTPUT = cc
+OUTPUT = aa
+OUTPUT = b
+OUTPUT = x 17
+INPUT = a 1
+OUTPUT = bb
+OUTPUT = dd
+OUTPUT = a
+OUTPUT = x
+
+RESTORE ARMA = temp FROM temp.wts
+NAME = restpred_x
+ARMA PREDICT = 200 temp
+ARMA PREDICT = 300 temp
+DISPLAY = restpred_x
+TRAIN ARMA = temp  ; Repeat to test retraining
+CLEAR ARMA = temp
+CLEAR INPUT LIST
+CLEAR OUTPUT LIST
+

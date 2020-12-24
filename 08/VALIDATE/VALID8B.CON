@@ -1,0 +1,54 @@
+;---------------------------------
+;  Pure MA
+;---------------------------------
+
+; Train the ARMA model and compute the shocks
+
+OUTPUT = sig2 1
+TRAIN ARMA = temp
+NAME = pred2_175
+ARMA PREDICT = 175 temp
+NAME = shock2 , shock2_save    ; Want to keep up a shock copy on display
+SUBTRACT = sig2 AND pred2_175  ; Neural prediction later will erase shock
+DISPLAY = sig2                 ; Original signal
+DISPLAY = pred2_175            ; Predictions within its extent
+DISPLAY = shock2_save          ; Shocks of that prediction
+
+; Train a neural network to predict the shocks
+; Exclude the first few cases, which are predictions before the MA
+; model settled down.
+
+CLEAR INPUT LIST
+CLEAR OUTPUT LIST
+INPUT = shock2 24-26
+INPUT = shock2 49-51
+OUTPUT = shock2
+CUMULATE EXCLUDE = 5
+CUMULATE TRAINING SET
+TRAIN NETWORK = temp
+NAME = shock2                  ; By using the same name as the input signal
+NETWORK PREDICT = 200 temp     ; We cause the true values to overwrite start
+DISPLAY = shock2               ; The predictions are at the end only
+
+; Do two ARMA predictions.
+; The first is the traditional method, using zero shocks beyond the end.
+; The second uses the predicted shocks.  Note the improvement.
+
+CLEAR INPUT LIST
+CLEAR OUTPUT LIST
+OUTPUT = sig2 1
+NAME = pred2_200_a             ; Traditional prediction with zero shocks
+ARMA PREDICT = 200 temp
+DISPLAY = pred2_200_a
+ARMA SHOCK = shock2 FOR sig2   ; Now tell the model to use the predicted shocks
+NAME = pred2_200_b
+ARMA PREDICT = 200 temp
+DISPLAY = pred2_200_b
+
+CLEAR INPUT LIST
+CLEAR OUTPUT LIST
+CLEAR ARMAS
+CLEAR NETWORKS
+CLEAR TRAINING SET
+
+

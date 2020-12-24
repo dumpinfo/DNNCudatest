@@ -1,0 +1,665 @@
+//#if !defined(__prdctapp_rh)                // Sentry use file only if it's not already included.
+//#define __prdctapp_rh
+
+//
+// IDHELP BorButton for BWCC dialogs.
+//
+#define IDHELP                  998             // Id of help button
+
+//
+// Menus
+//
+#define NULL_MENU               50              // Menu resource ID for non-menu
+#define MDI_MENU                     100        // Menu resource ID and Accelerator IDs
+#define CM_FILE_READ_SIGNAL          101
+#define CM_FILE_SAVE_SIGNAL          102
+#define CM_FILE_READ_NET             103
+#define CM_FILE_SAVE_NET             104
+#define CM_FILE_READ_ARMA            105
+#define CM_FILE_SAVE_ARMA            106
+#define CM_FILE_READ_ORTHOG          107
+#define CM_FILE_SAVE_ORTHOG          108
+#define CM_FILE_COMMAND_FILE         110
+#define CM_FILE_CLEAR                111
+#define CM_FILE_AUDIT_LOG            112
+#define CM_SIGOPS_DISPLAY_SIGNAL     120
+#define CM_SIGOPS_GENERATE           121
+#define CM_SIGOPS_COPY               122
+#define CM_SIGOPS_MODIFY             123
+#define CM_SIGOPS_FILTER             124
+#define CM_SIGOPS_LAGCORR            125
+#define CM_SIGOPS_SPECTRUM           126
+#define CM_SIGOPS_ARITH              127
+#define CM_SIGOPS_INSOUTS            128
+#define CM_SIGOPS_CUMULATE           129
+#define CM_SIGOPS_CONFCOMP           130
+#define CM_ORTHOG_DEFINE             140
+#define CM_ORTHOG_APPLY              141
+#define CM_NETWORK_CLASS             155
+#define CM_NETWORK_PRIOR             156
+#define CM_NETWORK_MODEL             161
+#define CM_NETWORK_TRAIN_NETWORK     164
+#define CM_NETWORK_TEST_NETWORK      165
+#define CM_NETWORK_PREDICT           167
+#define CM_ARMA_TRAIN                170
+#define CM_ARMA_SHOCK                171
+#define CM_ARMA_PREDICT              172
+
+//
+// Help menu commands.
+//
+#define CM_HELPABOUT            200
+#define CM_HELPSIZE             201
+
+//
+// Icons
+//
+#define IDI_MDIAPPLICATION      1001            // Application icon
+#define IDI_DOC                 1002            // MDI child window icon
+#define IDI_PROGRESS            1003            // Progress window icon
+#define IDI_COMMAND             1004            // Command control file icon
+
+//
+// Dialogs
+//
+
+#define IDD_READSIG               2000
+#define IDC_READSIG_FILENAME      2001
+#define IDC_READSIG_OBJNAME       2002
+#define IDD_SAVESIG               2010
+#define IDC_SAVESIG_FILENAME      2011
+#define IDC_SAVESIG_OBJNAME       2012
+#define IDD_READNET               2020
+#define IDC_READNET_FILENAME      2021
+#define IDC_READNET_OBJNAME       2022
+#define IDD_SAVENET               2030
+#define IDC_SAVENET_FILENAME      2031
+#define IDC_SAVENET_OBJNAME       2032
+#define IDC_SAVENET_PRINT         2034
+#define IDD_READARMA              2040
+#define IDC_READARMA_FILENAME     2041
+#define IDC_READARMA_OBJNAME      2042
+#define IDD_SAVEARMA              2050
+#define IDC_SAVEARMA_FILENAME     2051
+#define IDC_SAVEARMA_OBJNAME      2052
+#define IDD_READORTHOG            2060
+#define IDC_READORTHOG_FILENAME   2061
+#define IDC_READORTHOG_OBJNAME    2062
+#define IDD_SAVEORTHOG            2070
+#define IDC_SAVEORTHOG_FILENAME   2071
+#define IDC_SAVEORTHOG_OBJNAME    2072
+
+#define IDD_CLEAR                 2100
+#define IDC_CLEAR_INPUT           2101
+#define IDC_CLEAR_OUTPUT          2102
+#define IDC_CLEAR_CLASSES         2103
+#define IDC_CLEAR_TRAINING        2104
+#define IDC_CLEAR_TEST            2105
+#define IDC_CLEAR_CONF            2106
+#define IDC_CLEAR_NET             2107
+#define IDC_CLEAR_NETS            2108
+#define IDC_CLEAR_ARMA            2109
+#define IDC_CLEAR_ARMAS           2110
+#define IDC_CLEAR_ORTHOG          2111
+#define IDC_CLEAR_ORTHOGS         2112
+#define IDC_CLEAR_ALL             2113
+#define IDC_CLEAR_GROUPBOX        2114
+#define IDC_CLEAR_NET_NAME        2115
+#define IDC_CLEAR_ARMA_NAME       2116
+#define IDC_CLEAR_ORTHOG_NAME     2117
+
+#define IDD_DISPLAY               2300
+#define IDC_DISPLAY_OPTIMAL       2301
+#define IDC_DISPLAY_SYMMETRIC     2302
+#define IDC_DISPLAY_FIXED         2303
+#define IDC_DISPLAY_GROUP1        2304
+#define IDC_DISPLAY_DOMAIN0_LABEL 2305
+#define IDC_DISPLAY_DOMAIN0       2306
+#define IDC_DISPLAY_DOMAIN1_LABEL 2307
+#define IDC_DISPLAY_DOMAIN1       2308
+#define IDC_DISPLAY_SIGMIN_LABEL  2309
+#define IDC_DISPLAY_SIGMIN        2310
+#define IDC_DISPLAY_SIGMAX_LABEL  2311
+#define IDC_DISPLAY_SIGMAX        2312
+#define IDC_DISPLAY_ORIGIN_LABEL  2313
+#define IDC_DISPLAY_ORIGIN        2314
+#define IDC_DISPLAY_RATE_LABEL    2315
+#define IDC_DISPLAY_RATE          2316
+#define IDC_DISPLAY_GROUP2        2317
+#define IDC_DISPLAY_CONFIDENCE    2318
+#define IDC_DISPLAY_SOURCE        2319
+
+#define IDD_GENERATE              2400
+#define IDC_GENERATE_ARMA         2401
+#define IDC_GENERATE_NORMAL       2402
+#define IDC_GENERATE_UNIFORM      2403
+#define IDC_GENERATE_RAMP         2404
+#define IDC_GENERATE_SINE         2405
+#define IDC_GENERATE_GROUP        2406
+#define IDC_GENERATE_AR1_LABEL    2407
+#define IDC_GENERATE_AR1          2408
+#define IDC_GENERATE_AR2_LABEL    2409
+#define IDC_GENERATE_AR2          2410
+#define IDC_GENERATE_AR10_LABEL   2411
+#define IDC_GENERATE_AR10         2412
+#define IDC_GENERATE_MA1_LABEL    2413
+#define IDC_GENERATE_MA1          2414
+#define IDC_GENERATE_MA2_LABEL    2415
+#define IDC_GENERATE_MA2          2416
+#define IDC_GENERATE_MA10_LABEL   2417
+#define IDC_GENERATE_MA10         2418
+#define IDC_GENERATE_MEAN_LABEL   2419
+#define IDC_GENERATE_MEAN         2420
+#define IDC_GENERATE_STD_LABEL    2421
+#define IDC_GENERATE_STD          2422
+#define IDC_GENERATE_LOW_LABEL    2423
+#define IDC_GENERATE_LOW          2424
+#define IDC_GENERATE_HIGH_LABEL   2425
+#define IDC_GENERATE_HIGH         2426
+#define IDC_GENERATE_HEIGHT_LABEL 2427
+#define IDC_GENERATE_HEIGHT       2428
+#define IDC_GENERATE_RPERIOD_LABEL 2429
+#define IDC_GENERATE_RPERIOD      2430
+#define IDC_GENERATE_AMP_LABEL    2431
+#define IDC_GENERATE_AMP          2432
+#define IDC_GENERATE_SPERIOD_LABEL 2433
+#define IDC_GENERATE_SPERIOD      2434
+#define IDC_GENERATE_PHASE_LABEL  2435
+#define IDC_GENERATE_PHASE        2436
+#define IDC_GENERATE_POINTS       2437
+#define IDC_GENERATE_DEST         2438
+
+#define IDD_COPY                  2500
+#define IDC_COPY_POINTS_LABEL     2501
+#define IDC_COPY_POINTS           2502
+#define IDC_COPY_START            2503
+#define IDC_COPY_END              2504
+#define IDC_COPY_GROUP            2505
+#define IDC_COPY_SOURCE           2506
+#define IDC_COPY_DEST             2507
+#define IDC_COPY_LENGTH           2508
+
+#define IDD_MODIFY                2600
+#define IDC_MODIFY_SOURCE_LABEL   2601
+#define IDC_MODIFY_PER_LABEL      2602
+#define IDC_MODIFY_UNDO           2603
+#define IDC_MODIFY_MEDIAN         2604
+#define IDC_MODIFY_CENTER         2605
+#define IDC_MODIFY_DETREND        2606
+#define IDC_MODIFY_OFFSET         2607
+#define IDC_MODIFY_SCALE          2608
+#define IDC_MODIFY_STDIZE         2609
+#define IDC_MODIFY_DIFF           2610
+#define IDC_MODIFY_SEASONAL       2611
+#define IDC_MODIFY_LOG            2612
+#define IDC_MODIFY_EXP            2613
+#define IDC_MODIFY_INTEGRATE      2614
+#define IDC_MODIFY_INTEGRATE_PARM 2615
+#define IDC_MODIFY_GROUPBOX1      2616
+#define IDC_MODIFY_OFFSET_PARM    2617
+#define IDC_MODIFY_SCALE_PARM     2618
+#define IDC_MODIFY_DIFF_PARM      2619
+#define IDC_MODIFY_SEASONAL_PARM  2620
+#define IDC_MODIFY_SOURCE         2621
+#define IDC_MODIFY_PER            2622
+
+#define IDD_FILTER                3000
+#define IDC_FILTER_LOWPASS        3001
+#define IDC_FILTER_HIGHPASS       3002
+#define IDC_FILTER_BANDPASS       3003
+#define IDC_FILTER_SAVGOL         3004
+#define IDC_FILTER_MA             3005
+#define IDC_FILTER_QMF            3006
+#define IDC_FILTER_MORLET         3007
+#define IDC_FILTER_SOURCE         3010
+#define IDC_FILTER_DEST_LABEL     3011
+#define IDC_FILTER_DEST           3012
+#define IDC_FILTER_FREQ_LABEL     3013
+#define IDC_FILTER_FREQ           3014
+#define IDC_FILTER_WIDTH_LABEL    3015
+#define IDC_FILTER_WIDTH          3016
+#define IDC_FILTER_POINTS_LABEL   3017
+#define IDC_FILTER_POINTS         3018
+#define IDC_FILTER_ORDER_LABEL    3019
+#define IDC_FILTER_ORDER          3020
+#define IDC_FILTER_DETREND        3030
+
+#define IDD_LAGCORR               3100
+#define IDC_LAGCORR_AUTO          3101
+#define IDC_LAGCORR_PARTAUTO      3102
+#define IDC_LAGCORR_CROSS         3103
+#define IDC_LAGCORR_PARTCROSS     3104
+#define IDC_LAGCORR_GROUPBOX      3105
+#define IDC_LAGCORR_MAXLAG        3106
+#define IDC_LAGCORR_SOURCE        3107
+#define IDC_LAGCORR_SOURCE2_LABEL 3108
+#define IDC_LAGCORR_SOURCE2       3109
+#define IDC_LAGCORR_DEST          3110
+
+#define IDD_SPECTRUM              3200
+#define IDC_SPECTRUM_DFT          3201
+#define IDC_SPECTRUM_MAXENT       3202
+#define IDC_SPECTRUM_TYPE         3203
+#define IDC_SPECTRUM_NOWINDOW     3204
+#define IDC_SPECTRUM_WELCH        3205
+#define IDC_SPECTRUM_WINDOW       3206
+#define IDC_SPECTRUM_POINTS_LABEL 3207
+#define IDC_SPECTRUM_POINTS       3208
+#define IDC_SPECTRUM_ORDER_LABEL  3209
+#define IDC_SPECTRUM_ORDER        3210
+#define IDC_SPECTRUM_SOURCE       3211
+#define IDC_SPECTRUM_DEST_LABEL   3212
+#define IDC_SPECTRUM_DEST         3213
+
+#define IDD_ARITH                 3300
+#define IDC_ARITH_ADD             3301
+#define IDC_ARITH_SUBTRACT        3302
+#define IDC_ARITH_MULTIPLY        3303
+#define IDC_ARITH_DIVIDE          3304
+#define IDC_ARITH_GROUP1          3305
+#define IDC_ARITH_SOURCE          3306
+#define IDC_ARITH_SOURCE2         3307
+#define IDC_ARITH_DEST            3308
+
+#define IDD_INSOUTS               3500
+#define IDC_INSOUTS_INNAME        3501
+#define IDC_INSOUTS_INNAME1       3502
+#define IDC_INSOUTS_INNAME2       3503
+#define IDC_INSOUTS_INNAME3       3504
+#define IDC_INSOUTS_INNAME4       3505
+#define IDC_INSOUTS_INNAME5       3506
+#define IDC_INSOUTS_INNAME6       3507
+#define IDC_INSOUTS_INNAME7       3508
+#define IDC_INSOUTS_INNAME8       3509
+#define IDC_INSOUTS_INNAME9       3510
+#define IDC_INSOUTS_INMIN         3511
+#define IDC_INSOUTS_INMIN1        3512
+#define IDC_INSOUTS_INMIN2        3513
+#define IDC_INSOUTS_INMIN3        3514
+#define IDC_INSOUTS_INMIN4        3515
+#define IDC_INSOUTS_INMIN5        3516
+#define IDC_INSOUTS_INMIN6        3517
+#define IDC_INSOUTS_INMIN7        3518
+#define IDC_INSOUTS_INMIN8        3519
+#define IDC_INSOUTS_INMIN9        3520
+#define IDC_INSOUTS_INMAX         3521
+#define IDC_INSOUTS_INMAX1        3522
+#define IDC_INSOUTS_INMAX2        3523
+#define IDC_INSOUTS_INMAX3        3524
+#define IDC_INSOUTS_INMAX4        3525
+#define IDC_INSOUTS_INMAX5        3526
+#define IDC_INSOUTS_INMAX6        3527
+#define IDC_INSOUTS_INMAX7        3528
+#define IDC_INSOUTS_INMAX8        3529
+#define IDC_INSOUTS_INMAX9        3530
+#define IDC_INSOUTS_OUTNAME       3531
+#define IDC_INSOUTS_OUTNAME1      3532
+#define IDC_INSOUTS_OUTNAME2      3533
+#define IDC_INSOUTS_OUTNAME3      3534
+#define IDC_INSOUTS_OUTNAME4      3535
+#define IDC_INSOUTS_OUTNAME5      3536
+#define IDC_INSOUTS_OUTNAME6      3537
+#define IDC_INSOUTS_OUTNAME7      3538
+#define IDC_INSOUTS_OUTNAME8      3539
+#define IDC_INSOUTS_OUTNAME9      3540
+#define IDC_INSOUTS_OUTMIN        3541
+#define IDC_INSOUTS_OUTMIN1       3542
+#define IDC_INSOUTS_OUTMIN2       3543
+#define IDC_INSOUTS_OUTMIN3       3544
+#define IDC_INSOUTS_OUTMIN4       3545
+#define IDC_INSOUTS_OUTMIN5       3546
+#define IDC_INSOUTS_OUTMIN6       3547
+#define IDC_INSOUTS_OUTMIN7       3548
+#define IDC_INSOUTS_OUTMIN8       3549
+#define IDC_INSOUTS_OUTMIN9       3550
+#define IDC_INSOUTS_OUTMAX        3551
+#define IDC_INSOUTS_OUTMAX1       3552
+#define IDC_INSOUTS_OUTMAX2       3553
+#define IDC_INSOUTS_OUTMAX3       3554
+#define IDC_INSOUTS_OUTMAX4       3555
+#define IDC_INSOUTS_OUTMAX5       3556
+#define IDC_INSOUTS_OUTMAX6       3557
+#define IDC_INSOUTS_OUTMAX7       3558
+#define IDC_INSOUTS_OUTMAX8       3559
+#define IDC_INSOUTS_OUTMAX9       3560
+#define IDC_INSOUTS_INPUTS        3561
+#define IDC_INSOUTS_OUTPUTS       3562
+
+#define IDD_CUMULATE              3600
+#define IDC_CUMULATE_TRAINING     3601
+#define IDC_CUMULATE_TEST         3602
+#define IDC_CUMULATE_GROUP        3603
+#define IDC_CUMULATE_INCLUDE      3604
+#define IDC_CUMULATE_EXCLUDE      3605
+
+#define IDD_CONFCOMP              3700
+#define IDC_CONFCOMP_CLEAR        3701
+#define IDC_CONFCOMP_CENTER       3702
+#define IDC_CONFCOMP_DETREND      3703
+#define IDC_CONFCOMP_OFFSET       3704
+#define IDC_CONFCOMP_SCALE        3705
+#define IDC_CONFCOMP_STD          3706
+#define IDC_CONFCOMP_LOG          3707
+#define IDC_CONFCOMP_DIFF         3708
+#define IDC_CONFCOMP_SEASONAL     3709
+#define IDC_CONFCOMP_GROUP        3710
+#define IDC_CONFCOMP_SIG          3711
+#define IDC_CONFCOMP_PER_LABEL	  3712
+#define IDC_CONFCOMP_PER          3713
+
+#define IDD_ORTHOG_DEFINE         3800
+#define IDC_ORTHOG_DEFINE_PRINCO  3801
+#define IDC_ORTHOG_DEFINE_CENTROID 3802
+#define IDC_ORTHOG_DEFINE_DISCRIM 3803
+#define IDC_ORTHOG_DEFINE_GROUP   3804
+#define IDC_ORTHOG_DEFINE_FACTORS 3805
+#define IDC_ORTHOG_DEFINE_LIMIT   3806
+#define IDC_ORTHOG_DEFINE_STD     3807
+#define IDC_ORTHOG_DEFINE_NAME    3808
+
+#define IDD_ORTHOG_APPLY          3810
+#define IDC_ORTHOG_APPLY_NAME     3811
+#define IDC_ORTHOG_APPLY_DEST     3812
+
+#define IDD_NET_MODEL             4000
+#define IDC_NETMODEL_PNN_GAUSS    4001
+#define IDC_NETMODEL_PNN_RECIP    4002
+#define IDC_NETMODEL_SEPVAR       4003
+#define IDC_NETMODEL_SEPCLASS     4004
+#define IDC_NETMODEL_MLFN_REAL    4005
+#define IDC_NETMODEL_MLFN_CPXIN   4006
+#define IDC_NETMODEL_MLFN_CPXHID  4007
+#define IDC_NETMODEL_MLFN_CPX     4008
+#define IDC_NETMODEL_GROUP1       4009
+#define IDC_NETMODEL_HID1         4011
+#define IDC_NETMODEL_HID1_LABEL   4012
+#define IDC_NETMODEL_HID2         4013
+#define IDC_NETMODEL_HID2_LABEL   4014
+#define IDC_NETMODEL_LINEAR       4015
+#define IDC_NETMODEL_GROUP2       4016
+
+#define IDD_TRAIN_PNN             5000
+#define IDC_TRAIN_PNN_PROGRESS	  5001
+#define IDC_TRAIN_PNN_ERROR_LABEL 5002
+#define IDC_TRAIN_PNN_ERROR       5003
+#define IDC_TRAIN_PNN_ACC_LABEL   5004
+#define IDC_TRAIN_PNN_ACC         5005
+#define IDC_TRAIN_PNN_REFINE_LABEL 5006
+#define IDC_TRAIN_PNN_REFINE      5007
+#define IDC_TRAIN_PNN_SIGLO_LABEL 5008
+#define IDC_TRAIN_PNN_SIGLO       5009
+#define IDC_TRAIN_PNN_SIGHI_LABEL 5010
+#define IDC_TRAIN_PNN_SIGHI       5011
+#define IDC_TRAIN_PNN_NSIGS_LABEL 5012
+#define IDC_TRAIN_PNN_NSIGS       5013
+#define IDC_TRAIN_PNN_GROUP1      5014
+#define IDC_TRAIN_PNN_GROUP2      5015
+#define IDC_TRAIN_PNN_NETNAMES    5016
+#define IDC_TRAIN_PNN_CV          5017
+
+#define IDD_TRAIN_MLFN	          5100
+#define IDC_TRAIN_MLFN_PROGRESS   5101
+#define IDC_TRAIN_MLFN_ERROR_LABEL 5102
+#define IDC_TRAIN_MLFN_ERROR      5103
+#define IDC_TRAIN_MLFN_REFINE_LABEL 5104
+#define IDC_TRAIN_MLFN_REFINE     5105
+#define IDC_TRAIN_MLFN_ACC_LABEL  5106
+#define IDC_TRAIN_MLFN_ACC        5107
+#define IDC_TRAIN_MLFN_TERMINATION 5108
+#define IDC_TRAIN_MLFN_NETNAMES    5109
+#define IDC_TRAIN_MLFN_PRETRIES_LABEL 5110
+#define IDC_TRAIN_MLFN_PRETRIES   5111
+#define IDC_TRAIN_MLFN_RESTARTS_LABEL 5112
+#define IDC_TRAIN_MLFN_RESTARTS   5113
+#define IDC_TRAIN_MLFN_HYBRIDS    5114
+#define IDC_TRAIN_MLFN_ERR_MSE    5115
+#define IDC_TRAIN_MLFN_ERR_ABS    5116
+#define IDC_TRAIN_MLFN_ERR_KK     5117
+#define IDC_TRAIN_MLFN_ERR_XENT   5118
+#define IDC_TRAIN_MLFN_ERRTYPE    5119
+#define IDC_TRAIN_MLFN_METHOD_AN1 5120
+#define IDC_TRAIN_MLFN_METHOD_AN1CJ 5121
+#define IDC_TRAIN_MLFN_METHOD_AN1LM 5122
+#define IDC_TRAIN_MLFN_METHOD_AN2   5123
+#define IDC_TRAIN_MLFN_METHOD_AN2CJ 5124
+#define IDC_TRAIN_MLFN_METHOD_AN2LM 5125
+#define IDC_TRAIN_MLFN_METHOD_REGCJ 5126
+#define IDC_TRAIN_MLFN_METHOD_REGLM 5127
+#define IDC_TRAIN_MLFN_METHOD_SS    5128
+#define IDC_TRAIN_MLFN_METHOD_SSG   5129
+#define IDC_TRAIN_MLFN_METHOD       5130
+#define IDC_TRAIN_MLFN_NTEMPS       5131
+#define IDC_TRAIN_MLFN_NITERS       5132
+#define IDC_TRAIN_MLFN_SETBACK      5133
+#define IDC_TRAIN_MLFN_START        5134
+#define IDC_TRAIN_MLFN_STOP         5135
+#define IDC_TRAIN_MLFN_RANDOM       5136
+#define IDC_TRAIN_MLFN_REDUC        5137
+#define IDC_TRAIN_MLFN_CLIMB       5138
+#define IDC_TRAIN_MLFN_RATIO        5139
+#define IDC_TRAIN_MLFN_INIT         5140
+#define IDC_TRAIN_MLFN_ESCAPE       5141
+#define IDC_TRAIN_MLFN_INIT_NTEMPS  5142
+#define IDC_TRAIN_MLFN_INIT_NITERS  5143
+#define IDC_TRAIN_MLFN_INIT_SETBACK 5144
+#define IDC_TRAIN_MLFN_INIT_START   5145
+#define IDC_TRAIN_MLFN_INIT_STOP    5146
+#define IDC_TRAIN_MLFN_INIT_RANDOM  5147
+#define IDC_TRAIN_MLFN_INIT_GAUSS   5148
+#define IDC_TRAIN_MLFN_INIT_CAUCHY  5149
+#define IDC_TRAIN_MLFN_INIT_REDUCTION 5150
+#define IDC_TRAIN_MLFN_INIT_EXP     5151
+#define IDC_TRAIN_MLFN_INIT_FAST    5152
+#define IDC_TRAIN_MLFN_INIT_CLIMB   5153
+#define IDC_TRAIN_MLFN_INIT_RATIO   5154
+#define IDC_TRAIN_MLFN_ESCAPE_NTEMPS 5155
+#define IDC_TRAIN_MLFN_ESCAPE_NITERS 5156
+#define IDC_TRAIN_MLFN_ESCAPE_SETBACK 5157
+#define IDC_TRAIN_MLFN_ESCAPE_START   5158
+#define IDC_TRAIN_MLFN_ESCAPE_STOP    5159
+#define IDC_TRAIN_MLFN_ESCAPE_RANDOM  5160
+#define IDC_TRAIN_MLFN_ESCAPE_GAUSS   5161
+#define IDC_TRAIN_MLFN_ESCAPE_CAUCHY  5162
+#define IDC_TRAIN_MLFN_ESCAPE_REDUCTION 5163
+#define IDC_TRAIN_MLFN_ESCAPE_EXP     5164
+#define IDC_TRAIN_MLFN_ESCAPE_FAST    5165
+#define IDC_TRAIN_MLFN_ESCAPE_CLIMB   5166
+#define IDC_TRAIN_MLFN_ESCAPE_RATIO   5167
+#define IDC_TRAIN_MLFN_ANNEALING      5168
+#define IDC_TRAIN_MLFN_CV             5169
+
+#define IDD_NETWORK_TEST              5200
+#define IDC_NETWORK_TEST_EXTENDED     5201
+#define IDC_NETWORK_TEST_THRESH       5202
+#define IDC_NETWORK_TEST_NAMES        5203
+
+#define IDD_NETWORK_PREDICT           5400
+#define IDC_NETWORK_PREDICT_POINTS    5401
+#define IDC_NETWORK_PREDICT_NAME      5402
+#define IDC_NETWORK_PREDICT_DEST      5403
+#define IDC_NETWORK_PREDICT_CONF      5404
+#define IDC_NETWORK_PREDICT_DIST_LABEL 5405
+#define IDC_NETWORK_PREDICT_DIST      5406
+#define IDC_NETWORK_PREDICT_PCT_LABEL 5407
+#define IDC_NETWORK_PREDICT_PCT   5408
+#define IDC_NETWORK_PREDICT_GROUP     5409
+
+#define IDD_ARMA_TRAIN                6000
+#define IDC_ARMA_TRAIN_PROGRESS       6001
+#define IDC_ARMA_TRAIN_FIXED          6002
+#define IDC_ARMA_TRAIN_ERROR          6003
+#define IDC_ARMA_TRAIN_ACC            6004
+#define IDC_ARMA_TRAIN_REFINE         6005
+#define IDC_ARMA_TRAIN_NAME           6006
+
+#define IDD_ARMA_SHOCK                6010
+#define IDC_ARMA_SHOCK_SHOCKNAME      6011
+#define IDC_ARMA_SHOCK_SHOCKNAME1     6012
+#define IDC_ARMA_SHOCK_SHOCKNAME2     6013
+#define IDC_ARMA_SHOCK_SHOCKNAME3     6014
+#define IDC_ARMA_SHOCK_SHOCKNAME4     6015
+#define IDC_ARMA_SHOCK_SHOCKNAME5     6016
+#define IDC_ARMA_SHOCK_SHOCKNAME6     6017
+#define IDC_ARMA_SHOCK_SHOCKNAME7     6018
+#define IDC_ARMA_SHOCK_SHOCKNAME8     6019
+#define IDC_ARMA_SHOCK_SHOCKNAME9     6020
+#define IDC_ARMA_SHOCK_GROUP          6021
+#define IDC_ARMA_SHOCK_OUTNAME        6022
+#define IDC_ARMA_SHOCK_OUTNAME1       6023
+#define IDC_ARMA_SHOCK_OUTNAME2       6024
+#define IDC_ARMA_SHOCK_OUTNAME3       6025
+#define IDC_ARMA_SHOCK_OUTNAME4       6026
+#define IDC_ARMA_SHOCK_OUTNAME5       6027
+#define IDC_ARMA_SHOCK_OUTNAME6       6028
+#define IDC_ARMA_SHOCK_OUTNAME7       6029
+#define IDC_ARMA_SHOCK_OUTNAME8       6030
+#define IDC_ARMA_SHOCK_OUTNAME9       6031
+
+#define IDD_ARMA_PREDICT              6030
+#define IDC_ARMA_PREDICT_POINTS       6031
+#define IDC_ARMA_PREDICT_NAME         6032
+#define IDC_ARMA_PREDICT_DEST         6033
+#define IDC_ARMA_PREDICT_CONF         6034
+#define IDC_ARMA_PREDICT_DIST_LABEL   6035
+#define IDC_ARMA_PREDICT_DIST         6036
+#define IDC_ARMA_PREDICT_PCT_LABEL    6037
+#define IDC_ARMA_PREDICT_PCT          6038
+#define IDC_ARMA_PREDICT_GROUP        6039
+
+
+//
+// CM_FILEnnnn commands (include\owl\editfile.rh except for CM_FILEPRINTPREVIEW)
+//
+#define CM_MDIFILENEW           24331
+#define CM_MDIFILEOPEN          24332
+#define CM_FILECLOSE            24339
+#define CM_FILESAVE             24333
+#define CM_FILESAVEAS           24334
+
+
+//
+// Window commands (include\owl\window.rh)
+//
+#define CM_EXIT                 24310
+
+
+//
+// CM_EDITnnnn commands (include\owl\window.rh)
+//
+#define CM_EDITUNDO             24321
+#define CM_EDITCUT              24322
+#define CM_EDITCOPY             24323
+#define CM_EDITPASTE            24324
+#define CM_EDITDELETE           24325
+#define CM_EDITCLEAR            24326
+#define CM_EDITADD              24327
+#define CM_EDITEDIT             24328
+
+
+//
+// Search menu commands (include\owl\editsear.rh)
+//
+#define CM_EDITFIND             24351
+#define CM_EDITREPLACE          24352
+#define CM_EDITFINDNEXT         24353
+
+
+//
+// Windows menu commands (include\owl\mdi.rh)
+//
+#define CM_CASCADECHILDREN      24361
+#define CM_TILECHILDREN         24362
+#define CM_TILECHILDRENHORIZ    24363
+#define CM_ARRANGEICONS         24364
+#define CM_CLOSECHILDREN        24365
+#define CM_CREATECHILD          24366
+
+
+//
+// OWL defined strings
+//
+
+// Statusbar
+#define IDS_MODES               32530
+#define IDS_MODESOFF            32531
+
+
+// EditFile
+#define IDS_UNTITLED            32550
+#define IDS_UNABLEREAD          32551
+#define IDS_UNABLEWRITE         32552
+#define IDS_FILECHANGED         32553
+#define IDS_FILEFILTER          32554
+										  
+// EditSearch                   
+#define IDS_CANNOTFIND          32540
+
+
+//
+// General & application exception messages (include\owl\except.rh)
+//
+#define IDS_UNKNOWNEXCEPTION    32767
+#define IDS_OWLEXCEPTION        32766
+#define IDS_OKTORESUME          32765
+#define IDS_UNHANDLEDXMSG       32764
+#define IDS_UNKNOWNERROR        32763
+#define IDS_NOAPP               32762
+#define IDS_OUTOFMEMORY         32761
+#define IDS_INVALIDMODULE       32760
+#define IDS_INVALIDMAINWINDOW   32759
+
+//
+// Owl 1 compatibility messages
+//
+#define IDS_INVALIDWINDOW       32756
+#define IDS_INVALIDCHILDWINDOW  32755
+#define IDS_INVALIDCLIENTWINDOW 32754
+
+//
+// TXWindow messages
+//
+#define IDS_CLASSREGISTERFAIL   32749
+#define IDS_CHILDREGISTERFAIL   32748
+#define IDS_WINDOWCREATEFAIL    32747
+#define IDS_WINDOWEXECUTEFAIL   32746
+#define IDS_CHILDCREATEFAIL     32745
+
+#define IDS_MENUFAILURE         32744
+#define IDS_VALIDATORSYNTAX     32743
+#define IDS_PRINTERERROR        32742
+
+#define IDS_LAYOUTINCOMPLETE    32741
+#define IDS_LAYOUTBADRELWIN     32740
+
+//
+// TXGdi messages
+//
+#define IDS_GDIFAILURE          32739
+#define IDS_GDIALLOCFAIL        32738
+#define IDS_GDICREATEFAIL       32737
+#define IDS_GDIRESLOADFAIL      32736
+#define IDS_GDIFILEREADFAIL     32735
+#define IDS_GDIDELETEFAIL       32734
+#define IDS_GDIDESTROYFAIL      32733
+#define IDS_INVALIDDIBHANDLE    32732
+
+
+// TInputDialog DIALOG resource (include\owl\inputdia.rh)
+#define IDD_INPUTDIALOG         32514
+#define ID_PROMPT               4091
+#define ID_INPUT                4090
+
+
+// TSlider bitmaps (horizontal and vertical) (include\owl\slider.rh)
+#define IDB_HSLIDERTHUMB        32000
+#define IDB_VSLIDERTHUMB        32001
+
+
+// Validation messages (include\owl\validate.rh)
+#define IDS_VALPXPCONFORM       32520
+#define IDS_VALINVALIDCHAR      32521
+#define IDS_VALNOTINRANGE       32522
+#define IDS_VALNOTINLIST        32523
+
+//#endif         // __prdctapp_rh sentry.
+

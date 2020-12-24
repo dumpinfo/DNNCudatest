@@ -1,0 +1,115 @@
+;  Finally, do a complicated model.
+;  The inputs are sig1 and sig2, each at lag 1.
+;  The outputs are sig2 (MA13), sig3=sig1+sig2(MA13), and wave175.
+
+NAME = sig3
+ADD = sig1 AND sig2
+DISPLAY = sig3
+
+; Train the ARMA model and compute the shocks
+
+INPUT = sig1 12
+INPUT = sig2 12
+OUTPUT = sig2 13
+OUTPUT = sig3 13
+OUTPUT = wave175
+TRAIN ARMA = temp
+NAME = pred3_175_x , pred3_175_y , pred3_175_z
+ARMA PREDICT = 175 temp
+NAME = shock3x , shock3x_save
+SUBTRACT = sig2 AND pred3_175_x
+NAME = shock3y , shock3y_save
+SUBTRACT = sig3 AND pred3_175_y
+NAME = shock3z , shock3z_save
+SUBTRACT = wave175 AND pred3_175_z
+DISPLAY = shock3x_save
+DISPLAY = shock3y_save
+DISPLAY = shock3z_save
+
+; Train a neural network to predict the shocks
+; Exclude the first few cases, which are predictions before the MA
+; model settled down.
+
+CLEAR INPUT LIST
+CLEAR OUTPUT LIST
+INPUT = shock3x 24-26
+INPUT = shock3y 24-26
+INPUT = shock3z 24-26
+OUTPUT = shock3x
+OUTPUT = shock3y
+OUTPUT = shock3z
+CUMULATE EXCLUDE = 15
+CUMULATE TRAINING SET
+TRAIN NETWORK = temp
+NAME = shock3x , shock3y , shock3z
+NETWORK PREDICT = 200 temp
+DISPLAY = shock3x
+DISPLAY = shock3y
+DISPLAY = shock3z
+
+; Do five ARMA predictions.
+; The first is the traditional method, using zero shocks beyond the end.
+; The next three uses the predicted shocks, one at a time.
+; The last uses all predicted shocks.
+
+CLEAR INPUT LIST
+CLEAR OUTPUT LIST
+INPUT = sig1 12
+INPUT = sig2 12
+OUTPUT = sig2 13
+OUTPUT = sig3 13
+OUTPUT = wave175
+NAME = pred3_200_ax , pred3_200_ay , pred3_200_az
+ARMA PREDICT = 200 temp
+DISPLAY = pred3_200_ax
+DISPLAY = pred3_200_ay
+DISPLAY = pred3_200_az
+ARMA SHOCK = shock3x FOR sig2
+NAME = pred3_200_bx , pred3_200_by , pred3_200_bz
+ARMA PREDICT = 200 temp
+DISPLAY = pred3_200_bx
+DISPLAY = pred3_200_by
+DISPLAY = pred3_200_bz
+
+CLEAR OUTPUT LIST
+OUTPUT = sig2 13
+OUTPUT = sig3 13
+OUTPUT = wave175
+ARMA SHOCK = shock3y FOR sig3
+NAME = pred3_200_cx , pred3_200_cy , pred3_200_cz
+ARMA PREDICT = 200 temp
+DISPLAY = pred3_200_cx
+DISPLAY = pred3_200_cy
+DISPLAY = pred3_200_cz
+
+CLEAR OUTPUT LIST
+OUTPUT = sig2 13
+OUTPUT = sig3 13
+OUTPUT = wave175
+ARMA SHOCK = shock3z FOR wave175
+NAME = pred3_200_dx , pred3_200_dy , pred3_200_dz
+ARMA PREDICT = 200 temp
+DISPLAY = pred3_200_dx
+DISPLAY = pred3_200_dy
+DISPLAY = pred3_200_dz
+
+CLEAR OUTPUT LIST
+OUTPUT = sig2 13
+OUTPUT = sig3 13
+OUTPUT = wave175
+ARMA SHOCK = shock3x FOR sig2
+ARMA SHOCK = shock3y FOR sig3
+ARMA SHOCK = shock3z FOR wave175
+NAME = pred3_200_ex , pred3_200_ey , pred3_200_ez
+ARMA PREDICT = 200 temp
+DISPLAY = pred3_200_ex
+DISPLAY = pred3_200_ey
+DISPLAY = pred3_200_ez
+
+CLEAR INPUT LIST
+CLEAR OUTPUT LIST
+CLEAR ARMAS
+CLEAR NETWORKS
+CLEAR TRAINING SET
+
+
