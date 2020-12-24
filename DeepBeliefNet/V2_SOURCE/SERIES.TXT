@@ -1,0 +1,851 @@
+// The routines and code fragments here are related to preprocessing a time series
+
+
+/*
+--------------------------------------------------------------------------------
+
+   Compute simple series variables, including tail trimming.
+
+--------------------------------------------------------------------------------
+*/
+
+The following quantities are specified by the user:
+   length - Number of historical predictors desired
+   shift - Number of observations to shift window for each generated case
+   nature - One of the following four values:
+      RAW - Use the actual observations
+      RAWLOG - Use the log of the actual observations
+      DIFF - Use the difference of consecutive observations
+      DIFFLOG - Use the difference of the logs of consecutive observations
+
+   // How much must the window be expanded to include target and any differencing?
+   if (nature == RAW  ||  nature == RAWLOG)  // No differencing?
+      extra = 1 ;             // Just the target
+   else                       // But if differencing
+      extra = 2 ;             // We need to include one more
+
+   window = [Allocate memory for length+extra observations] ;
+
+   n_in_window = 0 ;  // Must fill window before we start generating database cases
+   shift_count = shift-1 ;  // Counter for window shifting
+   n_cases = 0 ;      // Will count generated cases
+
+   Initialize 'Most recent value of source series' to the first observation
+
+   for all cases {
+
+      x = [Most recent value of source series] ;
+
+      if (n_in_window == length+extra) { // If the window is full, shift down and put the new one in
+         for (i=1 ; i<n_in_window ; i++)
+            window[i-1] = window[i] ;
+         window[n_in_window-1] = x ;
+         }
+
+      else
+         window[n_in_window++] = x ;        // Keep filling the window
+
+      if (n_in_window < length+extra) {      // Do nothing if it's not full yet
+         Advance source series to next observation
+         continue ;
+         }
+
+/*
+   The window is full, so we are ready to compute the variables for this window.
+   But check how much the user wishes us to shift the window between variables for the database.
+*/
+
+      if (++shift_count < shift) {
+         Advance source series to next observation
+         continue ;
+         }
+
+      shift_count = 0 ;
+
+      // Compute the output record containing predictors and target
+
+      if (nature == RAW) {
+         for (i=0 ; i<=length ; i++)  // Includes target
+            record[i] = window[i] ;
+         }
+
+      else if (nature == RAWLOG) {
+         for (i=0 ; i<=length ; i++) {
+            if (window[i] > 0.0)
+               record[i] = log ( window[i] ) ;
+            else
+               record[i] = -1.e60 ;   // Arbitrary choice for illegal situation
+            }
+         }
+
+      else if (nature == DIFF) {
+         for (i=0 ; i<=length ; i++)  // Includes target
+            record[i] = window[i+1] - window[i] ;
+         }
+
+      else if (nature == DIFFLOG) {
+         for (i=0 ; i<=length ; i++) { // Includes target
+            if (window[i+1] > 0.0)
+               x = log ( window[i+1] ) ;
+            else
+               x = -1.e60 ;               // Arbitrary choice for illegal situation
+            if (window[i] > 0.0)
+               record[i] = x - log(window[i]) ;
+            else
+               record[i] = x + 1.e60 ;    // Arbitrary choice for illegal situation
+            }
+         }
+
+      Output record to database
+      Advance source series to next observation
+      ++n_cases ;    // Count cases generated
+      } // For all cases
+
+
+TAIL TRIMMING
+
+   for (ivar=0 ; ivar<=length ; ivar++) {     // Include target
+      for (i=0 ; i<n_cases ; i++)
+         work[i] = database[i*n_vars+ivar] ;
+      qsortd ( 0 , n_cases-1 , work ) ;
+      k = (int) (trim * (n_cases+1)) - 1 ;
+      if (k < 0)
+         k = 0 ;
+      xmin = work[k] ;
+      xmax = work[n_cases-1-k] ;
+      for (i=0 ; i<n_cases ; i++) {
+         if (database[i*n_vars+ivar] < xmin)
+            database[i*n_vars+ivar] = xmin ;
+         if (database[i*n_vars+ivar] > xmax)
+            database[i*n_vars+ivar] = xmax ;
+         }
+      } // For all predictors
+      
+      
+/*
+--------------------------------------------------------------------------------
+      
+ Series with path and optional velocity
+      
+--------------------------------------------------------------------------------
+*/
+
+
+The following quantities are specified by the user:
+   lookback - Length of lookback window for indicator computation
+   length - Number of basic variables generated
+   also_velocity - 1 or 0; if 1, also generate velocity variables
+   shift - Number of observations to shift window for each generated case
+   nature - One of the following four values which control the target (not the predictors)
+      RAW - Use the actual observations
+      RAWLOG - Use the log of the actual observations
+      DIFF - Use the difference of consecutive observations
+      DIFFLOG - Use the difference of the logs of consecutive observations
+
+
+   // Find number of predictors generated
+   npred = length ;
+   if (also_velocity)
+      npred *= 2 ;
+
+   window = [Allocate memory for length+also_velocity observations] ;
+   buffer = [Allocate memory for lookback+1 observations] ;
+   coefs = [Allocate memory for lookback observations] ;
+
+Compute and save the first-order Lengendre polynomial coefs for trend
+
+   sum = 0.0 ;
+   for (i=0 ; i<lookback ; i++) {
+      coefs[i] = 2.0 * i / (lookback - 1.0) - 1.0 ;
+      sum += coefs[i] * coefs[i] ;
+      }
+
+   sum = sqrt ( sum ) ;
+   for (i=0 ; i<lookback ; i++)
+      coefs[i] /= sum ;
+
+Initialize and start the main processing loop
+
+   shift_count = shift-1 ;  // Counter for window shifting
+   n_in_buffer = 0 ;  // Must fill buffer before we start computing indicator
+   n_in_window = 0 ;  // Must fill window before we start generating database cases
+   n_cases = 0 ;      // This global will count cases
+
+   Initialize 'Most recent value of source series' to the first observation
+
+   for (;;) {
+
+      x = [Most recent value of source series] ;
+
+If the buffer is full, shift down and put the new one in.
+We always keep one sample ahead in the buffer for the target.
+
+      if (n_in_buffer == lookback+1) {
+         for (i=1 ; i<n_in_buffer ; i++)
+            buffer[i-1] = buffer[i] ;
+         buffer[n_in_buffer-1] = x ;
+         }
+
+      else
+         buffer[n_in_buffer++] = x ;    // Keep filling the buffer
+
+      if (n_in_buffer < lookback+1) {   // Do nothing if it's not full yet
+         Advance source series to next observation
+         continue ;
+         }
+
+
+The bufffer is full.  Compute the indicator.
+
+      x = 0.0 ;
+      if (nature == RAWLOG || nature == DIFFLOG ) {
+         for (i=0 ; i<lookback ; i++) {
+            if (buffer[i] > 0.0)
+               x += coefs[i] * log ( buffer[i] ) ;
+            else
+               x -= 1.e60 ;
+            }
+         }
+      else {
+         for (i=0 ; i<lookback ; i++)
+            x += coefs[i] * buffer[i] ;
+         }
+
+If the window is full, shift down and put the new one in
+
+      if (n_in_window == length+also_velocity) {
+         for (i=1 ; i<n_in_window ; i++)
+            window[i-1] = window[i] ;
+         window[n_in_window-1] = x ;
+         }
+
+      else
+         window[n_in_window++] = x ;        // Keep filling the window
+
+      if (n_in_window < length+also_velocity) {  // Do nothing if it's not full yet
+         Advance source series to next observation
+         continue ;
+         }
+
+The window is full, so we are ready to output/compute the variables for this window.
+But check how much the user wishes us to shift the window between variables for the database.
+
+      if (++shift_count < shift) {
+         Advance source series to next observation
+         continue ;
+         }
+
+      shift_count = 0 ;
+
+
+Output the predictors
+
+      if (also_velocity) {  // If true, npred = 2 * length; else npred = length
+         for (i=1 ; i<=length ; i++) {
+            record[2*i-2] = window[i] ;               // Indicator
+            record[2*i-1] = window[i] - window[i-1] ; // Velocity
+            }
+         }
+      else {
+         for (i=0 ; i<npred ; i++)
+            record[i] = window[i] ;
+         }
+
+Output the targets
+
+      if (nature == RAW)
+         record[npred] = buffer[lookback] ;
+      else if (nature == RAWLOG) {
+         if (buffer[lookback] > 0.0)
+            record[npred] = log ( buffer[lookback] ) ;
+         else
+            record[npred] = -1.e60 ;
+         }
+      else if (nature == DIFF)
+         record[npred] = buffer[lookback] - buffer[lookback-1] ;
+      else if (nature == DIFFLOG) {
+         if (buffer[lookback] > 0.0)
+            tempa = log ( buffer[lookback] ) ;
+         else
+            tempa = -1.e60 ;
+         if (buffer[lookback-1] > 0.0)
+            tempb = log ( buffer[lookback-1] ) ;
+         else
+            tempb = -1.e60 ;
+         record[npred] = tempa - tempb ;
+         }
+
+      Output record to database
+      Advance source series to next observation
+      ++n_cases ;    // Count cases generated
+      } // For all cases
+
+
+/*
+--------------------------------------------------------------------------------
+
+   Compute first, second, and third-order normalized orthogonal coefs
+   for n data points.
+   Form the dot product of c1 with a series to compute the linear slope
+   Use c2 or c3 for quadratic or cubic fit.
+
+--------------------------------------------------------------------------------
+*/
+
+void legendre_3 ( int n , double *c1 , double *c2 , double *c3 )
+{
+   int i ;
+   double sum, mean, proj ;
+
+/*
+   Compute c1
+*/
+
+   sum = 0.0 ;
+   for (i=0 ; i<n ; i++) {
+      c1[i] = 2.0 * i / (n - 1.0) - 1.0 ;
+      sum += c1[i] * c1[i] ;
+      }
+
+   sum = sqrt ( sum ) ;
+   for (i=0 ; i<n ; i++)
+      c1[i] /= sum ;
+
+/*
+   Compute c2
+*/
+
+   sum = 0.0 ;
+   for (i=0 ; i<n ; i++) {
+      c2[i] = c1[i] * c1[i] ;
+      sum += c2[i] ;
+      }
+
+   mean = sum / n ;               // Center it and normalize to unit length
+
+   sum = 0.0 ;
+   for (i=0 ; i<n ; i++) {
+      c2[i] -= mean ;
+      sum += c2[i] * c2[i] ;
+      }
+
+   sum = sqrt ( sum ) ;
+   for (i=0 ; i<n ; i++)
+      c2[i] /= sum ;
+
+/*
+   Compute c3
+*/
+
+   sum = 0.0 ;
+   for (i=0 ; i<n ; i++) {
+      c3[i] = c1[i] * c1[i] * c1[i] ;
+      sum += c3[i] ;
+      }
+
+   mean = sum / n ;               // Center it and normalize to unit length
+
+   sum = 0.0 ;
+   for (i=0 ; i<n ; i++) {
+      c3[i] -= mean ;
+      sum += c3[i] * c3[i] ;
+      }
+
+   sum = sqrt ( sum ) ;
+   for (i=0 ; i<n ; i++)
+      c3[i] /= sum ;
+
+   // Remove the projection of c1
+
+   proj = 0.0 ;
+   for (i=0 ; i<n ; i++)
+      proj += c1[i] * c3[i] ;
+
+   sum = 0.0 ;
+   for (i=0 ; i<n ; i++) {
+      c3[i] -= proj * c1[i] ;
+      sum += c3[i] * c3[i] ;
+      }
+
+   sum = sqrt ( sum ) ;
+   for (i=0 ; i<n ; i++)
+      c3[i] /= sum ;
+}
+
+
+
+
+/*
+--------------------------------------------------------------------------------
+
+   Local routine computes FFT
+
+   There may be an even or odd number of cases,
+   and we may or may not be centering the data.
+
+   After the transform:
+
+      If n is even
+         R[0] = sum
+         I[0] = 0
+         R[n/2] = alternating sum
+         I[n/2] = 0
+         R[i] = R[n-i]
+         I[i] = -I[n-i]
+         We have n/2 real and n/2 imaginary unique values
+         and n/2+1 complex numbers with two zero parts
+
+      If n is odd
+         R[0] = sum
+         I[0] = 0
+         R[i] = R[n-i]
+         I[i] = -I[n-i]
+         R[n/2] and I[n/2] are valid almost-Nyquist data
+         We have n/2+1 real and n/2 imaginary unique values
+         and n/2+1 complex numbers with one zero part
+
+      But if we center, the sum is zero, so R[0] = I[0] = 0
+         
+--------------------------------------------------------------------------------
+*/
+
+static void do_fft (
+   int n ,          // Length of source data window; number of cases in 'in'
+   int center ,     // If nonzero, center the data before transforming (recommended)
+   double *in ,     // Source data, n long, preserved
+   double *out ,    // Output of transform
+   double *work ,   // Work vector  2*n long
+   FFT *fft
+   )
+{
+   int i, k ;
+   double *xr, *xi, win, wsum, dsum, wsq ;
+
+   xr = work ;
+   xi = xr + n ;
+
+/*
+   It would be slightly more efficient to use the half-length FFT
+   method.  But the difference is tiny and not worth the bother of
+   dealing with possibly odd length series.
+*/
+
+   for (i=0 ; i<n ; i++) {
+      xr[i] = in[i] ;
+      xi[i] = 0.0 ;
+      }
+
+   wsum = dsum = wsq = 0.0 ;
+   for (i=0 ; i<n ; i++) {
+      win = (i - 0.5 * (n-1)) / (0.5 * (n+1)) ;
+      win = 1.0 - win * win ;  // Welch data window
+      wsum += win ;
+      dsum += win * xr[i] ;
+      wsq += win * win ;
+      }
+
+   if (center)
+      dsum /= wsum ;                  // Weighted mean
+   else
+      dsum = 0.0 ;
+
+   wsq = 1.0 / sqrt ( n * wsq ) ;     // Compensate for reduced power
+
+   for (i=0 ; i<n ; i++) {
+      win = (i - 0.5 * (n-1)) / (0.5 * (n+1)) ;
+      win = 1.0 - win * win ;         // Welch data window
+      win *= wsq ;                    // Compensate for reduced power
+      xr[i] = win * (xr[i] - dsum) ;  // Window after centering
+      }
+
+   fft->cpx ( xr , xi , 1 ) ;  // Transform to frequency domain
+
+   k = 0 ;
+
+   if (! center)
+      out[k++] = xr[0] ;
+
+   for (i=1 ; i<n/2 ; i++) {
+      out[k++] = xr[i] ;
+      out[k++] = xi[i] ;
+      }
+
+   out[k++] = xr[n/2] ;
+   if (n % 2)
+      out[k++] = xi[n/2] ;
+}
+
+// Additional Fourier pseudo-code
+
+The following quantities are specified by the user:
+   length - Length of historical data window for transform
+   shift - Number of observations to shift window for each generated case
+   center - Should we center the data before transforming?
+   nature - One of the following four values:
+      RAW - Use the actual observations
+      RAWLOG - Use the log of the actual observations
+      DIFF - Use the difference of consecutive observations
+      DIFFLOG - Use the difference of the logs of consecutive observations
+
+   window = [Allocate memory for length+1 observations] ;
+   fft_work = [Allocate memory for 2*length observations] ) ;
+   fft = new FFT ( length , 1 , 1 ) ;
+
+   n_in_window = 0 ;  // Must fill window before we start generating database cases
+   shift_count = shift-1 ;  // Counter for window shifting
+   n_cases = 0 ;      // Will count generated cases
+
+// Note that default predictors are structured such that all variables are in real/imaginary pairs.
+// All variables that are not always zero are computed and entered into the database, but the offset (! center) does not go into default predictor list.
+// Also, if length is even, the real Nyquist does not go into default predictor list, because its imaginary is zero.
+// If we put it in with its imaginary mate we would have a constant zero predictor.
+// If we put it in without its imaginary mate we would break pairing.
+// Unfortunately, if length is even the real Nyquist component is omitted from the default predictor list.
+// However, the user can manually include it if desired (unlikely in most situations).
+
+// The database contains n_vars variables, while the default predictor list contains n_pred variables.
+
+   n_vars = n_pred = 0 ;
+
+   if (! center) {
+      Put name "Offset" in database name array ;
+      ++n_vars ;
+      }
+
+   for (i=1 ; i<length/2 ; i++) {
+      Put name "Real_i" in dataset name array ;
+      ++n_vars ;
+      Put name "Real_i" in default predictor list
+      ++n_pred ;
+      Put name "Imag_i" in dataset name array ;
+      ++n_vars ;
+      Put name "Imag_i" in default predictor list
+      ++n_pred ;
+      }
+
+   Put name "Real_n/2" in database name array ;
+   ++n_vars ;
+   if (length % 2) { // Is length odd?
+      Put name "Real_n/2" in default predictor list
+      ++n_pred ;
+      Put name "Imag_n/2" in database name array ;
+      ++n_vars ;
+      Put name "Imag_n/2" in default predictor list
+      ++n_pred ;
+      }
+
+   Initialize 'Most recent value of source series' to the first observation
+
+   for all cases {
+
+      x = [Most recent value of source series] ;
+
+      if (nature == RAWLOG  ||  nature == DIFFLOG) {
+         if (x > 0.0)
+            x = log ( x ) ;
+         else
+            x = -1.e60 ;
+         }
+
+      if (n_in_window == length+1) {    // If the window is full, shift down and put the new one in
+         for (i=1 ; i<n_in_window ; i++)
+            window[i-1] = window[i] ;
+         window[n_in_window-1] = x ;
+         }
+
+      else
+         window[n_in_window++] = x ;        // Keep filling the window
+
+      if (n_in_window < length+1) {  // Do nothing if it's not full yet
+         Advance source series to next observation
+         continue ;
+         }
+
+The window is full, so we are ready to compute the variables for this window.
+But check how much the user wishes us to shift the window between variables for the database.
+
+      if (++shift_count < shift) {
+         Advance source series to next observation
+         continue ;
+         }
+      shift_count = 0 ;
+
+Compute the variables.
+
+      do_fft ( length , center , window , record , fft_work , fft ) ;
+
+      if (nature == RAW  ||  nature == RAWLOG)
+         record[n_vars] = window[n_in_window-1] ;      // Target
+      else if (nature == DIFF  ||  nature == DIFFLOG)
+         record[n_vars] = window[n_in_window-1] - window[n_in_window-2] ;
+
+      Output record to database
+      Advance source series to next observation
+      ++n_cases ;    // Count cases generated
+      } // For all cases
+
+
+/*
+--------------------------------------------------------------------------------------
+
+   Do the Morlet transform
+
+--------------------------------------------------------------------------------------
+*/
+
+static void compute_morlet (
+   FFT *fft ,        // Does the FFT
+   int period ,      // Period (1 / center frequency) of desired filter
+   int width ,       // Width on each side of center
+   int lag ,         // Lag back from current for center of filter; ideally equals width
+   int lookback ,    // Number of samples in input buffer
+   int n ,           // Lookback plus padding, bumped up to nearest power of two
+   double *buffer ,  // Input data
+   double *realval , // Real value returned here
+   double *imagval , // Imaginary value returned here
+   double *xr ,      // Work vector n long
+   double *xi ,      // Ditto
+   double *yr ,      // Ditto
+   double *yi )      // Ditto
+{
+   int i, nyquist ;
+   double mean, freq, fwidth, multiplier, f, wt ;
+
+   nyquist = n / 2 ;   // The transform and function are symmetric around this index
+   freq = 1.0 / period ;
+   fwidth = 0.8 / width ;
+
+
+/*
+   Copy the data from the user's series to a local work area, and pad with mean as needed.
+   Reverse the time order for slight simplification:
+   Lag will be from start of series, and padding is at end.
+*/
+
+   mean = 0.0 ;
+   for (i=0 ; i<lookback ; i++) {
+      xr[i] = buffer[lookback-1-i] ;
+      xi[i] = 0.0 ;
+      mean += xr[i] ;
+      }
+
+   mean /= lookback ;
+
+   while (i<n) {
+      xr[i] = mean ;
+      xi[i++] = 0.0 ;
+      }
+
+
+/*
+-------------------------------------------------------------
+   Do the forward transform and multiply by REAL Morlet coefs
+   We need 'multiplier' to normalize the magnitude.
+-------------------------------------------------------------
+*/
+
+      fft->cpx ( xr , xi , 1 ) ;  // Transform to frequency domain
+      multiplier = 1.0 / (morlet_coefs ( freq , freq , fwidth , 1 ) + 1.e-140 ) ;
+
+      for (i=1 ; i<nyquist ; i++) {     // Do just symmetric part
+         f = (double) i / (double) n ;  // This frequency
+         wt = multiplier * morlet_coefs ( f , freq , fwidth , 1 ) ;
+         yr[i] = xr[i] * wt ;
+         yi[i] = xi[i] * wt ;
+         yr[n-i] = xr[n-i] * wt ;
+         yi[n-i] = xi[n-i] * wt ;
+         } // For all unique frequencies strictly between zero and Nyquist
+
+      // The Morlet coef at f=0 is zero, so set yr[0] and yi[0] to zero.
+      // Also, the imaginary Nyquist in yi[nyquist] is always zero by definition.
+      // If this is a real transform, we need to weight the real Nyquist in
+      // yr[nyquist].  But if imaginary, the function is antisymmetric and
+      // crosses here.
+
+      yr[0] = yi[0] = yi[nyquist] = 0.0 ;  // Always true
+      wt = multiplier * morlet_coefs ( 0.5 , freq , fwidth , 1 ) ;
+      yr[nyquist] = xr[nyquist] * wt ;
+
+/*
+   Transform back to the time domain and return lagged value.
+*/
+
+      fft->cpx ( yr , yi , -1 ) ;        // Back to time domain
+      *realval = yr[lag] / n ;
+
+
+/*
+------------------------------------------------------------------
+   Do the forward transform and multiply by IMAGINARY Morlet coefs
+   We need 'multiplier' to normalize the magnitude.
+------------------------------------------------------------------
+*/
+
+      multiplier = 1.0 / (morlet_coefs ( freq , freq , fwidth , 0 ) + 1.e-140 ) ;
+
+      for (i=1 ; i<nyquist ; i++) {     // Do just symmetric part
+         f = (double) i / (double) n ;  // This frequency
+         wt = multiplier * morlet_coefs ( f , freq , fwidth , 0 ) ;
+         yr[i] = -xi[i] * wt ;
+         yi[i] = xr[i] * wt ;
+         yr[n-i] = xi[n-i] * wt ;
+         yi[n-i] = -xr[n-i] * wt ;
+         } // For all unique frequencies strictly between zero and Nyquist
+
+      // The Morlet coef at f=0 is zero, so set yr[0] and yi[0] to zero.
+      // Also, the imaginary Nyquist in yi[nyquist] is always zero by definition.
+      // The imaginary function is antisymmetric and crosses here.
+
+      yr[0] = yi[0] = yr[nyquist] = yi[nyquist] = 0.0 ;
+
+/*
+   Transform back to the time domain and return lagged value.
+*/
+
+      fft->cpx ( yr , yi , -1 ) ;        // Back to time domain
+      *imagval = -yr[lag] / n ;
+} ;
+
+
+/*
+------------------------------------------------------------------
+   Pseudocode for using the prior Morlet wavelet routines
+------------------------------------------------------------------
+*/
+
+The following quantities are specified by the user:
+   length - Number of historical values of transform to compute (npred is twice this)
+   shift - Number of observations to shift window for each generated case
+   period - 1.0 / center frequency of wavelet filter
+   width - Filter half-width
+   lag - Lag from current value to filter center, ideally equals width
+   nature - One of the following four values:
+      RAW - Use the actual observations
+      RAWLOG - Use the log of the actual observations
+      DIFF - Use the difference of consecutive observations
+      DIFFLOG - Use the difference of the logs of consecutive observations
+
+   npred = 2 * length ;  // Each transform value is a complex number
+
+/*
+   We will almost certainly want to pad the lookback sample points with innocuous values later.
+   There are two reasons for doing this:
+      1) As long as the user's specified lag is equal to the specified width,
+         the filter will not extend into the unknown future to any practical
+         degree.  (Recall that there is no reason to lag further back.)
+         However, the user may wish to exercise his right to use any shorter
+         lag, even including zero.  This violates the meaning of the filter,
+         but it still provides usable (and perhaps excellent) predictors.
+         So, if lag < width, a straight application of the FFT will cause
+         the filter to wrap around to the oldest points, causing serious
+         errors.  Hence we must pad with at least width-lag 'neutral' points
+         to ameliorate this problem.
+      2) FFTs are by far most efficient when they are dealing with a number
+         of points that is a power of two.  Although not strictly necessary,
+         bump up to a power of two for the sake of speed.
+*/
+
+   lookback = 2 * width + 1 ;    // We'll need this much data
+   pad = width - lag ;           // Prevent wraparound.
+
+   for (n=2 ; n<MAXPOSNUM/2 ; n*=2) {
+      if (n >= lookback+pad)
+         break ;
+      }
+
+   window = [Allocate memory for 2*length observations] ;  // Each element is a complex number
+   buffer = [Allocate memory for lookback+1 observations] ;   // We must keep one ahead in the buffer for the target
+   xr = [Allocate memory for n reals] ;
+   xi = [Allocate memory for n reals] ;
+   yr = [Allocate memory for n reals] ;
+   yi = [Allocate memory for n reals] ;
+
+   fft = new FFT ( n , 1 , 1 ) ;
+
+   n_cases = 0 ;      // This will count cases
+   n_in_window = 0 ;  // Must fill window before we start generating database cases; this is npred/2 because complex numbers
+   n_in_buffer = 0 ;  // Must fill buffer before we start computing transform
+   shift_count = shift-1 ;
+
+   for all cases {
+
+      x = [Most recent value of source series] ;
+
+      if (nature == RAWLOG  ||  nature == DIFFLOG) {
+         if (x > 0.0)
+            x = log ( x ) ;
+         else
+            x = -1.e60 ;
+         }
+
+/*
+   If the buffer is full, shift down and put the new one in.
+   We always keep one sample ahead in the buffer for the target
+*/
+
+      if (n_in_buffer == lookback+1) {
+         for (i=1 ; i<n_in_buffer ; i++)
+            buffer[i-1] = buffer[i] ;
+         buffer[n_in_buffer-1] = x ;
+         }
+
+      else
+         buffer[n_in_buffer++] = x ;     // Keep filling the buffer
+
+      if (n_in_buffer < lookback+1) {    // Do nothing if it's not full yet
+         Advance source series to next observation
+         continue ;
+         }
+
+/*
+   Compute the transform.
+   If the window is full, shift down and put the new one in
+   Recall that n_in_window counts complex numbers
+*/
+
+      compute_morlet ( fft , period , width , lag , lookback , n ,
+                       buffer , &realval , &imagval , xr , xi , yr , yi ) ;
+
+      if (n_in_window == length) {
+         for (i=1 ; i<n_in_window ; i++) {
+            window[2*i-2] = window[2*i] ;
+            window[2*i-1] = window[2*i+1] ;
+            }
+         window[2*n_in_window-2] = realval ;
+         window[2*n_in_window-1] = imagval ;
+         }
+
+      else {
+         window[2*n_in_window] = realval ;       // Keep filling the window
+         window[2*n_in_window+1] = imagval ;
+         ++n_in_window ;
+         }
+
+      if (n_in_window < length) {   // Do nothing if it's not full yet
+         Advance source series to next observation
+         continue ;
+         }
+
+/*
+   The window is full, so we are ready to output/compute the variables for this window.
+   But check how much the user wishes us to shift the window between variables for the database.
+*/
+
+      if (++shift_count < shift)
+         continue ;
+      shift_count = 0 ;
+
+      // Output the predictors and compute the targets
+
+      for (i=0 ; i<npred ; i++)
+         record[i] = window[i] ;
+
+      if (nature == RAW  ||  nature == RAWLOG)
+         record[npred] = buffer[lookback] ;
+      else if (nature == RAWLOG  ||  nature == DIFFLOG)
+         record[npred] = buffer[lookback] - buffer[lookback-1] ;
+
+      Output record to database
+      Advance source series to next observation
+      ++n_cases ;
+      } // For all cases
